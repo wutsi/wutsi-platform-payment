@@ -1,0 +1,40 @@
+package com.wutsi.platform.payment.provider.mtn.product
+
+import com.wutsi.platform.payment.core.Http
+import com.wutsi.platform.payment.provider.mtn.MTNApiConfig
+import com.wutsi.platform.payment.provider.mtn.model.TokenResponse
+import java.util.Base64
+
+abstract class AbstractApi(
+    protected val config: MTNApiConfig,
+    protected val http: Http
+) {
+    protected abstract fun uri(path: String): String
+
+    fun token(): TokenResponse =
+        http.post(
+            uri = uri("token"),
+            headers = mapOf(
+                "Content-Type" to "application/json",
+                "Authorization" to "Basic " + credentials(),
+                "Ocp-Apim-Subscription-Key" to config.subscriptionKey
+            ),
+            requestPayload = mapOf("foo" to "bar"),
+            responseType = TokenResponse::class.java
+        )!!
+
+    protected fun headers(referenceId: String?, accessToken: String) = mutableMapOf<String, String?>(
+        "Content-Type" to "application/json",
+        "Authorization" to "Bearer $accessToken",
+        "X-Callback-Url" to config.callbackUrl,
+        "X-Reference-Id" to referenceId,
+        "X-Target-Environment" to config.environment.name.toLowerCase(),
+        "Ocp-Apim-Subscription-Key" to config.subscriptionKey
+    )
+
+    private fun credentials(): String {
+        val user = config.userProvider.get()
+        val str = "${user.id}:${user.apiKey}"
+        return Base64.getEncoder().encodeToString(str.toByteArray())
+    }
+}
