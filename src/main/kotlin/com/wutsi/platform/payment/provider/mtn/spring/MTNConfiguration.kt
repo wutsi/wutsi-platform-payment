@@ -77,8 +77,6 @@ open class MTNConfiguration(
             val context = SSLContext.getInstance("TLS")
             context.init(null, trustAllCerts, SecureRandom())
 
-            System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification", "true")
-
             return Http(
                 client = HttpClient.newBuilder()
                     .version(HTTP_1_1)
