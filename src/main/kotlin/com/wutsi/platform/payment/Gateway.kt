@@ -1,8 +1,8 @@
 package com.wutsi.platform.payment
 
-import com.wutsi.platform.payment.model.PayRequest
-import com.wutsi.platform.payment.model.PayResponse
-import com.wutsi.platform.payment.model.PaymentResponse
+import com.wutsi.platform.payment.model.CreatePaymentRequest
+import com.wutsi.platform.payment.model.CreatePaymentResponse
+import com.wutsi.platform.payment.model.GetPaymentResponse
 import java.io.IOException
 
 interface Gateway {
@@ -11,8 +11,8 @@ interface Gateway {
     fun provider(): PaymentMethodProvider
 
     @Throws(PaymentException::class, IOException::class)
-    fun pay(request: PayRequest): PayResponse
+    fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse
 
     @Throws(PaymentException::class, IOException::class)
-    fun payment(transactionId: String): PaymentResponse
+    fun getPayment(transactionId: String): GetPaymentResponse
 }

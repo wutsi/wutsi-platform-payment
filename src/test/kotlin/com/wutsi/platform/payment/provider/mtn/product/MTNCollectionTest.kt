@@ -10,10 +10,10 @@ import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-internal class CollectionApiTest {
+internal class MTNCollectionTest {
     @Test
     fun token() {
-        val api = createApi()
+        val api = createProduct()
         val response = api.token()
 
         println(">>> access_token: ${response.access_token}")
@@ -24,7 +24,7 @@ internal class CollectionApiTest {
 
     @Test
     fun `request to pay and SUCCESSFUL`() {
-        val api = createApi()
+        val api = createProduct()
         val accessToken = api.token().access_token
         val referenceId = UUID.randomUUID().toString()
         val request = createRequestToPayRequest("237221234100")
@@ -43,7 +43,7 @@ internal class CollectionApiTest {
 
     @Test
     fun `request to pay and REJECTED`() {
-        val api = createApi()
+        val api = createProduct()
         val accessToken = api.token().access_token
         val referenceId = UUID.randomUUID().toString()
         val request = createRequestToPayRequest(Fixtures.NUMBER_REJECTED)
@@ -55,7 +55,7 @@ internal class CollectionApiTest {
 
     @Test
     fun `request to pay and FAILED`() {
-        val api = createApi()
+        val api = createProduct()
         val accessToken = api.token().access_token
         val referenceId = UUID.randomUUID().toString()
         val request = createRequestToPayRequest(Fixtures.NUMBER_FAILED)
@@ -67,7 +67,7 @@ internal class CollectionApiTest {
 
     @Test
     fun `request to pay and PENDING`() {
-        val api = createApi()
+        val api = createProduct()
         val accessToken = api.token().access_token
         val referenceId = UUID.randomUUID().toString()
         val request = createRequestToPayRequest(Fixtures.NUMBER_PENDING)
@@ -77,11 +77,11 @@ internal class CollectionApiTest {
         assertEquals("PENDING", response.status)
     }
 
-    private fun createApi(
+    private fun createProduct(
         config: MTNApiConfig = Fixtures.createCollectionApiConfig(),
         http: Http = Fixtures.createHttp()
-    ): CollectionApi =
-        CollectionApi(config, http)
+    ): MTNCollection =
+        MTNCollection(config, http)
 
     private fun createRequestToPayRequest(number: String) = RequestToPayRequest(
         payeeNote = "Yo man",

@@ -5,10 +5,10 @@ import com.wutsi.platform.payment.provider.mtn.MTNApiConfig
 import com.wutsi.platform.payment.provider.mtn.model.RequestToPayRequest
 import com.wutsi.platform.payment.provider.mtn.model.RequestToPayResponse
 
-class CollectionApi(
+open class MTNCollection(
     config: MTNApiConfig,
     http: Http
-) : AbstractApi(config, http) {
+) : AbstractMTNProduct(config, http) {
     fun requestToPay(
         referenceId: String,
         accessToken: String,

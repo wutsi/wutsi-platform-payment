@@ -8,32 +8,28 @@ import com.wutsi.platform.payment.core.Error
 import com.wutsi.platform.payment.core.ErrorCode
 import com.wutsi.platform.payment.core.ErrorCode.AUTHENTICATION_FAILED
 import com.wutsi.platform.payment.core.ErrorCode.UNEXPECTED_ERROR
-import com.wutsi.platform.payment.core.Http
 import com.wutsi.platform.payment.core.HttpException
 import com.wutsi.platform.payment.core.Money
 import com.wutsi.platform.payment.core.Status
 import com.wutsi.platform.payment.core.Status.STATUS_FAILED
 import com.wutsi.platform.payment.core.Status.STATUS_PENDING
 import com.wutsi.platform.payment.core.Status.STATUS_SUCCESS
-import com.wutsi.platform.payment.model.PayRequest
-import com.wutsi.platform.payment.model.PayResponse
-import com.wutsi.platform.payment.model.PaymentResponse
+import com.wutsi.platform.payment.model.CreatePaymentRequest
+import com.wutsi.platform.payment.model.CreatePaymentResponse
+import com.wutsi.platform.payment.model.GetPaymentResponse
 import com.wutsi.platform.payment.provider.mtn.model.Party
 import com.wutsi.platform.payment.provider.mtn.model.RequestToPayRequest
-import com.wutsi.platform.payment.provider.mtn.product.CollectionApi
+import com.wutsi.platform.payment.provider.mtn.product.MTNCollection
 import java.util.UUID
 
 class MTNGateway(
-    private val collectionConfig: MTNApiConfig,
-    private val http: Http
+    private val collection: MTNCollection
 ) : Gateway {
-    private val collection = CollectionApi(collectionConfig, http)
-
     override fun type() = PAYMENT_METHOD_TYPE_MOBILE_PAYMENT
 
     override fun provider() = PAYMENT_METHOD_PROVIDER_MTN
 
-    override fun pay(request: PayRequest): PayResponse {
+    override fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {
         val transactionId = UUID.randomUUID().toString()
         try {
 
@@ -46,14 +42,14 @@ class MTNGateway(
                     currency = request.amount.currency,
                     payer = Party(request.payer.phoneNumber),
                     payeeNote = request.description ?: "",
-                    externalId = request.invoiceId ?: "",
+                    externalId = request.externalId ?: "",
                     payerMessage = request.payerMessage ?: ""
                 )
             )
             val response = collection.requestToPay(transactionId, accessToken)
             val status = toStatus(response.status)
             if (status == STATUS_PENDING || status == STATUS_SUCCESS)
-                return PayResponse(
+                return CreatePaymentResponse(
                     transactionId = transactionId,
                     status = toStatus(response.status)
                 )
@@ -70,13 +66,13 @@ class MTNGateway(
         }
     }
 
-    override fun payment(transactionId: String): PaymentResponse {
+    override fun getPayment(transactionId: String): GetPaymentResponse {
         val accessToken = collection.token().access_token
         val response = collection.requestToPay(transactionId, accessToken)
         val status = toStatus(response.status)
 
         if (status == STATUS_PENDING || status == STATUS_SUCCESS)
-            return PaymentResponse(
+            return GetPaymentResponse(
                 payer = com.wutsi.platform.payment.model.Party(
                     phoneNumber = response.payer.partyId
                 ),

@@ -5,13 +5,13 @@ import com.wutsi.platform.payment.provider.mtn.MTNApiConfig
 import com.wutsi.platform.payment.provider.mtn.model.TokenResponse
 import java.util.Base64
 
-abstract class AbstractApi(
+abstract class AbstractMTNProduct(
     protected val config: MTNApiConfig,
     protected val http: Http
-) {
+) : MTNProduct {
     protected abstract fun uri(path: String): String
 
-    fun token(): TokenResponse =
+    override fun token(): TokenResponse =
         http.post(
             uri = uri("token"),
             headers = mapOf(

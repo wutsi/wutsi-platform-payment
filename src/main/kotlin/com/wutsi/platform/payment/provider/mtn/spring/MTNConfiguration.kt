@@ -10,7 +10,9 @@ import com.wutsi.platform.payment.provider.mtn.MTNGateway
 import com.wutsi.platform.payment.provider.mtn.MTNUserProvider
 import com.wutsi.platform.payment.provider.mtn.MTNUserProviderProduction
 import com.wutsi.platform.payment.provider.mtn.MTNUserProviderSandbox
+import com.wutsi.platform.payment.provider.mtn.product.MTNCollection
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -36,11 +38,16 @@ open class MTNConfiguration(
     @Value("\${wutsi.platform.payment.mtn.collection:api-key:}") private val collectionApiKey: String
 ) {
     @Bean
-    open fun mtnGateway(): MTNGateway {
-        val http = createHttp()
-        return MTNGateway(
-            http = http,
-            collectionConfig = MTNApiConfig(
+    open fun mtnGateway(): MTNGateway =
+        MTNGateway(
+            collection = mtnCollection()
+        )
+
+    @Bean
+    open fun mtnCollection(): MTNCollection =
+        MTNCollection(
+            http = mtnHttp(),
+            config = MTNApiConfig(
                 environment = mtnEnvironment(),
                 subscriptionKey = collectionSubscriptionKey,
                 callbackUrl = collectionCallbackUrl,
@@ -49,13 +56,17 @@ open class MTNConfiguration(
                     apiKey = collectionApiKey,
                     subscriptionKey = collectionSubscriptionKey,
                     callbackUrl = collectionCallbackUrl,
-                    http = http
+                    http = mtnHttp()
                 )
             )
         )
-    }
 
-    private fun createHttp(): Http {
+    @Bean
+    open fun mtnCollectionHealthCheck(): HealthIndicator =
+        MTNProductHealthIndicator(mtnCollection())
+
+    @Bean
+    open fun mtnHttp(): Http {
         if (mtnEnvironment() == SANDBOX) {
             val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
                 override fun getAcceptedIssuers(): Array<X509Certificate>? = null
