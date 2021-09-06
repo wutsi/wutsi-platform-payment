@@ -5,27 +5,26 @@ import com.wutsi.platform.payment.provider.mtn.Fixtures
 import com.wutsi.platform.payment.provider.mtn.MTNApiConfig
 import com.wutsi.platform.payment.provider.mtn.model.Party
 import com.wutsi.platform.payment.provider.mtn.model.RequestToPayRequest
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 internal class MTNCollectionTest {
-    @Test
-    fun token() {
-        val api = createProduct()
-        val response = api.token()
+    private var accessToken: String = ""
 
-        println(">>> access_token: ${response.access_token}")
-        assertNotNull(response.access_token)
-        assertNotNull(response.token_type)
-        assertNotNull(response.expires_in)
+    @BeforeEach
+    fun setUp() {
+        if (accessToken.isEmpty()) {
+            val api = createProduct()
+            accessToken = api.token().access_token
+        }
     }
 
     @Test
     fun `request to pay and SUCCESSFUL`() {
         val api = createProduct()
-        val accessToken = api.token().access_token
         val referenceId = UUID.randomUUID().toString()
         val request = createRequestToPayRequest("237221234100")
         api.requestToPay(referenceId, accessToken, request)
@@ -44,7 +43,6 @@ internal class MTNCollectionTest {
     @Test
     fun `request to pay and REJECTED`() {
         val api = createProduct()
-        val accessToken = api.token().access_token
         val referenceId = UUID.randomUUID().toString()
         val request = createRequestToPayRequest(Fixtures.NUMBER_REJECTED)
         api.requestToPay(referenceId, accessToken, request)
@@ -56,7 +54,6 @@ internal class MTNCollectionTest {
     @Test
     fun `request to pay and FAILED`() {
         val api = createProduct()
-        val accessToken = api.token().access_token
         val referenceId = UUID.randomUUID().toString()
         val request = createRequestToPayRequest(Fixtures.NUMBER_FAILED)
         api.requestToPay(referenceId, accessToken, request)
@@ -68,7 +65,6 @@ internal class MTNCollectionTest {
     @Test
     fun `request to pay and PENDING`() {
         val api = createProduct()
-        val accessToken = api.token().access_token
         val referenceId = UUID.randomUUID().toString()
         val request = createRequestToPayRequest(Fixtures.NUMBER_PENDING)
         api.requestToPay(referenceId, accessToken, request)

@@ -53,6 +53,7 @@ class MTNUserProviderSandbox(
             requestPayload = emptyMap<String, String>(),
             responseType = ApiKeyResponse::class.java
         )!!.apiKey
+        LOGGER.info("User#$userId - apiKey=$apiKey")
 
         return MTNUser(id = userId, apiKey = apiKey)
     }

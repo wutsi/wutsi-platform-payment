@@ -20,16 +20,23 @@ import com.wutsi.platform.payment.model.GetPaymentResponse
 import com.wutsi.platform.payment.provider.mtn.model.Party
 import com.wutsi.platform.payment.provider.mtn.model.RequestToPayRequest
 import com.wutsi.platform.payment.provider.mtn.product.MTNCollection
+import org.slf4j.LoggerFactory
 import java.util.UUID
 
 class MTNGateway(
     private val collection: MTNCollection
 ) : Gateway {
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(MTNGateway::class.java)
+    }
+
     override fun type() = PAYMENT_METHOD_TYPE_MOBILE_PAYMENT
 
     override fun provider() = PAYMENT_METHOD_PROVIDER_MTN
 
     override fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {
+        LOGGER.info("Creating payment")
+
         val transactionId = UUID.randomUUID().toString()
         try {
 
@@ -67,6 +74,8 @@ class MTNGateway(
     }
 
     override fun getPayment(transactionId: String): GetPaymentResponse {
+        LOGGER.info("Retrieving payment $transactionId")
+
         val accessToken = collection.token().access_token
         val response = collection.requestToPay(transactionId, accessToken)
         val status = toStatus(response.status)
