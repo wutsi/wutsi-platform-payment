@@ -23,4 +23,4 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git pull
-          mvn -s settings.xml -q -B -e release:prepare release:perform
+          mvn -s settings.xml -q -B -e -X release:prepare release:perform
