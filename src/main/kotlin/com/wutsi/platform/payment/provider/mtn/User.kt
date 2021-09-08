@@ -1,6 +1,6 @@
 package com.wutsi.platform.payment.provider.mtn
 
-data class MTNUser(
+data class User(
     val id: String,
     val apiKey: String
 )

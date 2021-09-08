@@ -2,7 +2,6 @@ package com.wutsi.platform.payment.provider.mtn.product
 
 import com.wutsi.platform.payment.core.Http
 import com.wutsi.platform.payment.provider.mtn.Fixtures
-import com.wutsi.platform.payment.provider.mtn.MTNApiConfig
 import com.wutsi.platform.payment.provider.mtn.model.Party
 import com.wutsi.platform.payment.provider.mtn.model.RequestToPayRequest
 import org.junit.jupiter.api.BeforeEach
@@ -11,14 +10,13 @@ import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-internal class MTNCollectionTest {
+internal class CollectionTest {
     private var accessToken: String = ""
 
     @BeforeEach
     fun setUp() {
         if (accessToken.isEmpty()) {
-            val api = createProduct()
-            accessToken = api.token().access_token
+            accessToken = createProduct().token().access_token
         }
     }
 
@@ -74,10 +72,10 @@ internal class MTNCollectionTest {
     }
 
     private fun createProduct(
-        config: MTNApiConfig = Fixtures.createCollectionApiConfig(),
+        config: ProductConfig = Fixtures.createCollectionConfig(),
         http: Http = Fixtures.createHttp()
-    ): MTNCollection =
-        MTNCollection(config, http)
+    ): Collection =
+        Collection(config, http)
 
     private fun createRequestToPayRequest(number: String) = RequestToPayRequest(
         payeeNote = "Yo man",

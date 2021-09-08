@@ -2,15 +2,16 @@ package com.wutsi.platform.payment.provider.mtn.spring
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wutsi.platform.payment.core.Http
-import com.wutsi.platform.payment.provider.mtn.MTNApiConfig
-import com.wutsi.platform.payment.provider.mtn.MTNEnvironment
-import com.wutsi.platform.payment.provider.mtn.MTNEnvironment.PRODUCTION
-import com.wutsi.platform.payment.provider.mtn.MTNEnvironment.SANDBOX
+import com.wutsi.platform.payment.provider.mtn.Environment
+import com.wutsi.platform.payment.provider.mtn.Environment.PRODUCTION
+import com.wutsi.platform.payment.provider.mtn.Environment.SANDBOX
 import com.wutsi.platform.payment.provider.mtn.MTNGateway
-import com.wutsi.platform.payment.provider.mtn.MTNUserProvider
-import com.wutsi.platform.payment.provider.mtn.MTNUserProviderProduction
-import com.wutsi.platform.payment.provider.mtn.MTNUserProviderSandbox
-import com.wutsi.platform.payment.provider.mtn.product.MTNCollection
+import com.wutsi.platform.payment.provider.mtn.UserProvider
+import com.wutsi.platform.payment.provider.mtn.impl.UserProviderProduction
+import com.wutsi.platform.payment.provider.mtn.impl.UserProviderSandbox
+import com.wutsi.platform.payment.provider.mtn.product.Collection
+import com.wutsi.platform.payment.provider.mtn.product.Disbursment
+import com.wutsi.platform.payment.provider.mtn.product.ProductConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -32,30 +33,52 @@ import javax.net.ssl.X509TrustManager
 )
 open class MTNConfiguration(
     @Value("\${wutsi.platform.payment.mtn.environment}") private val environment: String,
+    @Value("\${wutsi.platform.payment.mtn.callback-url}") private val callbackUrl: String,
     @Value("\${wutsi.platform.payment.mtn.collection:subscription-key}") private val collectionSubscriptionKey: String,
-    @Value("\${wutsi.platform.payment.mtn.collection:callback-url}") private val collectionCallbackUrl: String,
     @Value("\${wutsi.platform.payment.mtn.collection:user-id:}") private val collectionUserId: String,
-    @Value("\${wutsi.platform.payment.mtn.collection:api-key:}") private val collectionApiKey: String
+    @Value("\${wutsi.platform.payment.mtn.collection:api-key:}") private val collectionApiKey: String,
+    @Value("\${wutsi.platform.payment.mtn.disbursement:subscription-key}") private val disbursementSubscriptionKey: String,
+    @Value("\${wutsi.platform.payment.mtn.disbursement:user-id:}") private val disbursementUserId: String,
+    @Value("\${wutsi.platform.payment.mtn.disbursement:api-key:}") private val disbursementApiKey: String
 ) {
     @Bean
     open fun mtnGateway(): MTNGateway =
         MTNGateway(
-            collection = mtnCollection()
+            collection = mtnCollection(),
+            disbursment = mtnDisbursement()
         )
 
     @Bean
-    open fun mtnCollection(): MTNCollection =
-        MTNCollection(
+    open fun mtnCollection(): Collection =
+        Collection(
             http = mtnHttp(),
-            config = MTNApiConfig(
+            config = ProductConfig(
                 environment = mtnEnvironment(),
                 subscriptionKey = collectionSubscriptionKey,
-                callbackUrl = collectionCallbackUrl,
+                callbackUrl = callbackUrl,
                 userProvider = createUserProvider(
                     userId = collectionUserId,
                     apiKey = collectionApiKey,
                     subscriptionKey = collectionSubscriptionKey,
-                    callbackUrl = collectionCallbackUrl,
+                    callbackUrl = callbackUrl,
+                    http = mtnHttp()
+                )
+            )
+        )
+
+    @Bean
+    open fun mtnDisbursement(): Disbursment =
+        Disbursment(
+            http = mtnHttp(),
+            config = ProductConfig(
+                environment = mtnEnvironment(),
+                subscriptionKey = disbursementSubscriptionKey,
+                callbackUrl = callbackUrl,
+                userProvider = createUserProvider(
+                    userId = disbursementUserId,
+                    apiKey = disbursementApiKey,
+                    subscriptionKey = disbursementSubscriptionKey,
+                    callbackUrl = callbackUrl,
                     http = mtnHttp()
                 )
             )
@@ -64,6 +87,10 @@ open class MTNConfiguration(
     @Bean
     open fun mtnCollectionHealthCheck(): HealthIndicator =
         MTNProductHealthIndicator(mtnCollection())
+
+    @Bean
+    open fun mtnDisbursementHealthCheck(): HealthIndicator =
+        MTNProductHealthIndicator(mtnDisbursement())
 
     @Bean
     open fun mtnHttp(): Http {
@@ -102,13 +129,13 @@ open class MTNConfiguration(
         subscriptionKey: String,
         callbackUrl: String,
         http: Http
-    ): MTNUserProvider =
+    ): UserProvider =
         if (mtnEnvironment() == PRODUCTION)
-            MTNUserProviderProduction(userId, apiKey)
+            UserProviderProduction(userId, apiKey)
         else
-            MTNUserProviderSandbox(subscriptionKey, callbackUrl, http)
+            UserProviderSandbox(subscriptionKey, callbackUrl, http)
 
-    private fun mtnEnvironment(): MTNEnvironment =
+    private fun mtnEnvironment(): Environment =
         if (environment.equals("production", ignoreCase = true) || environment.equals("prod", ignoreCase = true))
             PRODUCTION
         else

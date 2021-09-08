@@ -1,15 +1,16 @@
-package com.wutsi.platform.payment.provider.mtn
+package com.wutsi.platform.payment.provider.mtn.impl
 
+import com.wutsi.platform.payment.provider.mtn.Fixtures
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
-internal class MTNUserProviderSandboxTest {
+internal class UserProviderSandboxTest {
     @Test
     fun collectionUser() {
-        val user = MTNUserProviderSandbox(
+        val user = UserProviderSandbox(
             http = Fixtures.createHttp(),
             callbackUrl = "http://127.0.0.1",
-            subscriptionKey = Fixtures.COLLECTION_API_SUBSCRIPTION_KEY
+            subscriptionKey = Fixtures.COLLECTION_SUBSCRIPTION_KEY
         ).get()
 
         assertNotNull(user.id)
@@ -18,10 +19,10 @@ internal class MTNUserProviderSandboxTest {
 
     @Test
     fun getDisbusmentUser() {
-        val user = MTNUserProviderSandbox(
+        val user = UserProviderSandbox(
             http = Fixtures.createHttp(),
             callbackUrl = "http://127.0.0.1",
-            subscriptionKey = Fixtures.DISBURSEMENT_API_SUBSCRIPTION_KEY
+            subscriptionKey = Fixtures.DISBURSEMENT_SUBSCRIPTION_KEY
         ).get()
 
         assertNotNull(user.id)

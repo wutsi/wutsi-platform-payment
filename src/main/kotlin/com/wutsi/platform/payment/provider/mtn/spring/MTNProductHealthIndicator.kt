@@ -1,11 +1,11 @@
 package com.wutsi.platform.payment.provider.mtn.spring
 
-import com.wutsi.platform.payment.provider.mtn.product.MTNProduct
+import com.wutsi.platform.payment.provider.mtn.product.Product
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 
 class MTNProductHealthIndicator(
-    private val collection: MTNProduct
+    private val collection: Product
 ) : HealthIndicator {
     override fun health(): Health {
         try {

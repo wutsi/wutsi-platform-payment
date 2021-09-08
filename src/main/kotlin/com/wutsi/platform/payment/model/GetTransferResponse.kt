@@ -2,12 +2,13 @@ package com.wutsi.platform.payment.model
 
 import com.wutsi.platform.payment.core.Money
 import com.wutsi.platform.payment.core.Status
+import com.wutsi.platform.payment.core.Status.STATUS_UNKNOWN
 
-data class GetPaymentResponse(
+data class GetTransferResponse(
+    val payee: Party = Party(),
     val amount: Money = Money(),
-    val payer: Party = Party(),
-    val status: Status = Status.STATUS_UNKNOWN,
+    val externalId: String = "",
     val description: String = "",
     val payerMessage: String? = null,
-    val externalId: String = ""
+    val status: Status = STATUS_UNKNOWN
 )

@@ -16,15 +16,21 @@ import com.wutsi.platform.payment.core.Status.STATUS_PENDING
 import com.wutsi.platform.payment.core.Status.STATUS_SUCCESS
 import com.wutsi.platform.payment.model.CreatePaymentRequest
 import com.wutsi.platform.payment.model.CreatePaymentResponse
+import com.wutsi.platform.payment.model.CreateTransferRequest
+import com.wutsi.platform.payment.model.CreateTransferResponse
 import com.wutsi.platform.payment.model.GetPaymentResponse
+import com.wutsi.platform.payment.model.GetTransferResponse
 import com.wutsi.platform.payment.provider.mtn.model.Party
 import com.wutsi.platform.payment.provider.mtn.model.RequestToPayRequest
-import com.wutsi.platform.payment.provider.mtn.product.MTNCollection
+import com.wutsi.platform.payment.provider.mtn.model.TransferRequest
+import com.wutsi.platform.payment.provider.mtn.product.Collection
+import com.wutsi.platform.payment.provider.mtn.product.Disbursment
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
 class MTNGateway(
-    private val collection: MTNCollection
+    private val collection: Collection,
+    private val disbursment: Disbursment
 ) : Gateway {
     companion object {
         private val LOGGER = LoggerFactory.getLogger(MTNGateway::class.java)
@@ -92,7 +98,75 @@ class MTNGateway(
                 status = status,
                 description = response.payeeNote,
                 payerMessage = response.payerMessage,
-                invoiceId = response.externalId
+                externalId = response.externalId
+            )
+        else
+            throw PaymentException(
+                error = Error(
+                    code = toErrorCode(response.reason),
+                    transactionId = transactionId,
+                    supplierErrorCode = response.reason
+                )
+            )
+    }
+
+    override fun createTransfer(request: CreateTransferRequest): CreateTransferResponse {
+        LOGGER.info("Creating transfer")
+
+        val transactionId = UUID.randomUUID().toString()
+        try {
+
+            val accessToken = disbursment.token().access_token
+            disbursment.transfer(
+                referenceId = transactionId,
+                accessToken = accessToken,
+                request = TransferRequest(
+                    amount = request.amount.value.toString(),
+                    currency = request.amount.currency,
+                    payee = Party(request.payee.phoneNumber),
+                    payeeNote = request.description ?: "",
+                    externalId = request.externalId ?: "",
+                    payerMessage = request.payerMessage ?: ""
+                )
+            )
+            val response = disbursment.transfer(transactionId, accessToken)
+            val status = toStatus(response.status)
+            if (status == STATUS_PENDING || status == STATUS_SUCCESS)
+                return CreateTransferResponse(
+                    transactionId = transactionId,
+                    status = toStatus(response.status)
+                )
+            else
+                throw PaymentException(
+                    error = Error(
+                        code = toErrorCode(response.reason),
+                        transactionId = transactionId,
+                        supplierErrorCode = response.reason
+                    )
+                )
+        } catch (ex: HttpException) {
+            throw handleException(transactionId, ex)
+        }
+    }
+
+    override fun getTransfer(transactionId: String): GetTransferResponse {
+        val accessToken = disbursment.token().access_token
+        val response = disbursment.transfer(transactionId, accessToken)
+        val status = toStatus(response.status)
+
+        if (status == STATUS_PENDING || status == STATUS_SUCCESS)
+            return GetTransferResponse(
+                payee = com.wutsi.platform.payment.model.Party(
+                    phoneNumber = response.payee.partyId
+                ),
+                amount = Money(
+                    value = response.amount.toDouble(),
+                    currency = response.currency
+                ),
+                status = status,
+                description = response.payeeNote,
+                payerMessage = response.payerMessage,
+                externalId = response.externalId
             )
         else
             throw PaymentException(

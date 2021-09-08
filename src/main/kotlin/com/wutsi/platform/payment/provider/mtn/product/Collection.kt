@@ -1,14 +1,13 @@
 package com.wutsi.platform.payment.provider.mtn.product
 
 import com.wutsi.platform.payment.core.Http
-import com.wutsi.platform.payment.provider.mtn.MTNApiConfig
 import com.wutsi.platform.payment.provider.mtn.model.RequestToPayRequest
 import com.wutsi.platform.payment.provider.mtn.model.RequestToPayResponse
 
-open class MTNCollection(
-    config: MTNApiConfig,
+open class Collection(
+    config: ProductConfig,
     http: Http
-) : AbstractMTNProduct(config, http) {
+) : AbstractProduct(config, http) {
     fun requestToPay(
         referenceId: String,
         accessToken: String,

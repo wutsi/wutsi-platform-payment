@@ -17,8 +17,11 @@
 | Property | Default Value | Description |
 |----------|---------------|-------------|
 | wutsi.platform.payment.mtn.collection.environment |  | REQUIRED. `sandbox` or `production` |
+| wutsi.platform.payment.mtn.callback-url |  | REQUIRED. Callback URL |
 | wutsi.platform.payment.mtn.collection.subscription-key |  | REQUIRED. Subscription Key of the Collection API |
-| wutsi.platform.payment.mtn.collection.callback-url |  | REQUIRED. Callback URL of the Collection API |
 | wutsi.platform.payment.mtn.collection.user-id |  | Collection User ID. REQUIRED in production environment |
 | wutsi.platform.payment.mtn.collection.api-key |  | Collection API Key. REDIURED in production environment |
+| wutsi.platform.payment.mtn.disbursement.subscription-key |  | REQUIRED. Subscription Key of the Disbursement API |
+| wutsi.platform.payment.mtn.disbursement.user-id |  | Disbursement User ID. REQUIRED in production environment |
+| wutsi.platform.payment.mtn.disbursement.api-key |  | Disbursement API Key. REDIURED in production environment |
 

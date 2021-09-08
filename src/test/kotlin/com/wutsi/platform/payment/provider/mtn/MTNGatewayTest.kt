@@ -8,8 +8,10 @@ import com.wutsi.platform.payment.core.ErrorCode
 import com.wutsi.platform.payment.core.Money
 import com.wutsi.platform.payment.core.Status
 import com.wutsi.platform.payment.model.CreatePaymentRequest
+import com.wutsi.platform.payment.model.CreateTransferRequest
 import com.wutsi.platform.payment.model.Party
-import com.wutsi.platform.payment.provider.mtn.product.MTNCollection
+import com.wutsi.platform.payment.provider.mtn.product.Collection
+import com.wutsi.platform.payment.provider.mtn.product.Disbursment
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -17,7 +19,7 @@ import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertFalse
 
 internal class MTNGatewayTest {
-    val gateway: Gateway = createGateway()
+    private val gateway: Gateway = createGateway()
 
     @Test
     fun type() {
@@ -30,8 +32,8 @@ internal class MTNGatewayTest {
     }
 
     @Test
-    fun pay() {
-        val request = createRequest(Fixtures.NUMBER_SUCCESS)
+    fun `create payment`() {
+        val request = createCreatePaymentRequest(Fixtures.NUMBER_SUCCESS)
         val response = gateway.createPayment(request)
 
         assertNotNull(response.transactionId)
@@ -39,22 +41,8 @@ internal class MTNGatewayTest {
     }
 
     @Test
-    fun payment() {
-        val request = createRequest(Fixtures.NUMBER_PENDING)
-        val resp = gateway.createPayment(request)
-        val response = gateway.getPayment(resp.transactionId)
-
-        assertEquals(Status.STATUS_PENDING, response.status)
-        assertEquals(request.amount.value, response.amount.value)
-        assertEquals(request.amount.currency, response.amount.currency)
-        assertEquals(request.payerMessage, response.payerMessage)
-        assertEquals(request.description, response.description)
-        assertEquals(request.externalId, response.invoiceId)
-    }
-
-    @Test
-    fun failure() {
-        val request = createRequest(Fixtures.NUMBER_FAILED)
+    fun `create payment - failure`() {
+        val request = createCreatePaymentRequest(Fixtures.NUMBER_FAILED)
         val ex = assertThrows<PaymentException> {
             gateway.createPayment(request)
         }
@@ -65,8 +53,8 @@ internal class MTNGatewayTest {
     }
 
     @Test
-    fun timeout() {
-        val request = createRequest(Fixtures.NUMBER_TIMEOUT)
+    fun `create payment - timeout`() {
+        val request = createCreatePaymentRequest(Fixtures.NUMBER_TIMEOUT)
         val ex = assertThrows<PaymentException> {
             gateway.createPayment(request)
         }
@@ -79,16 +67,83 @@ internal class MTNGatewayTest {
         assertEquals("EXPIRED", ex.error.supplierErrorCode)
     }
 
+    @Test
+    fun `get payment information`() {
+        val request = createCreatePaymentRequest(Fixtures.NUMBER_PENDING)
+        val resp = gateway.createPayment(request)
+        val response = gateway.getPayment(resp.transactionId)
+
+        assertEquals(Status.STATUS_PENDING, response.status)
+        assertEquals(request.amount.value, response.amount.value)
+        assertEquals(request.amount.currency, response.amount.currency)
+        assertEquals(request.payerMessage, response.payerMessage)
+        assertEquals(request.description, response.description)
+        assertEquals(request.externalId, response.externalId)
+    }
+
+    @Test
+    fun `create transfer`() {
+        val request = createCreateTransferRequest(Fixtures.NUMBER_SUCCESS)
+        val response = gateway.createTransfer(request)
+
+        assertNotNull(response.transactionId)
+        assertEquals(Status.STATUS_SUCCESS, response.status)
+    }
+
+    @Test
+    fun `create transfer - failure`() {
+        val request = createCreateTransferRequest(Fixtures.NUMBER_FAILED)
+        val ex = assertThrows<PaymentException> {
+            gateway.createTransfer(request)
+        }
+
+        assertFalse(ex.error.transactionId.isNullOrBlank())
+        assertEquals(ErrorCode.INTERNAL_PROCESSING_ERROR, ex.error.code)
+        assertEquals("INTERNAL_PROCESSING_ERROR", ex.error.supplierErrorCode)
+    }
+
+    @Test
+    fun `get transfer information`() {
+        val request = createCreateTransferRequest(Fixtures.NUMBER_PENDING)
+        val resp = gateway.createTransfer(request)
+        val response = gateway.getTransfer(resp.transactionId)
+
+        assertEquals(Status.STATUS_PENDING, response.status)
+        assertEquals(request.amount.value, response.amount.value)
+        assertEquals(request.amount.currency, response.amount.currency)
+        assertEquals(request.payerMessage, response.payerMessage)
+        assertEquals(request.description, response.description)
+        assertEquals(request.externalId, response.externalId)
+    }
+
     private fun createGateway() =
         MTNGateway(
-            collection = MTNCollection(
-                config = Fixtures.createCollectionApiConfig(),
+            collection = Collection(
+                config = Fixtures.createCollectionConfig(),
+                http = Fixtures.createHttp()
+            ),
+            disbursment = Disbursment(
+                config = Fixtures.createDisbursementConfig(),
                 http = Fixtures.createHttp()
             )
         )
 
-    private fun createRequest(phoneNumber: String) = CreatePaymentRequest(
+    private fun createCreatePaymentRequest(phoneNumber: String) = CreatePaymentRequest(
         payer = Party(
+            fullName = "Ray Sponsible",
+            phoneNumber = phoneNumber
+        ),
+        amount = Money(
+            value = 100.0,
+            currency = "EUR"
+        ),
+        payerMessage = "Hello wold",
+        externalId = "1111",
+        description = "Sample product"
+    )
+
+    private fun createCreateTransferRequest(phoneNumber: String) = CreateTransferRequest(
+        payee = Party(
             fullName = "Ray Sponsible",
             phoneNumber = phoneNumber
         ),

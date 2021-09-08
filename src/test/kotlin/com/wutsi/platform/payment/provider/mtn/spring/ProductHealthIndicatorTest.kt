@@ -5,15 +5,15 @@ import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.wutsi.platform.payment.provider.mtn.model.TokenResponse
-import com.wutsi.platform.payment.provider.mtn.product.MTNProduct
+import com.wutsi.platform.payment.provider.mtn.product.Product
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.boot.actuate.health.Status
 
-internal class MTNProductHealthIndicatorTest {
-    private lateinit var product: MTNProduct
+internal class ProductHealthIndicatorTest {
+    private lateinit var product: Product
     private lateinit var hc: HealthIndicator
 
     @BeforeEach
