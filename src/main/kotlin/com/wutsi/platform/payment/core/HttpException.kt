@@ -6,7 +6,6 @@ class HttpException(
     message: String? = null,
     cause: Exception? = null
 ) : RuntimeException(message, cause) {
-    override fun getLocalizedMessage(): String {
-        return "$statusCode - $bodyString"
-    }
+    override val message: String
+        get() = "$statusCode - $bodyString"
 }

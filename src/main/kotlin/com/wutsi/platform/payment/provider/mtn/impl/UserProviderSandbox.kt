@@ -28,37 +28,42 @@ class UserProviderSandbox(
     }
 
     private fun createUser(): User {
-        LOGGER.info("Creating Sanbox user....")
+        LOGGER.info("Creating MTN Sandbox user. subscription-key=$subscriptionKey")
 
         // Create user
-        val userId = UUID.randomUUID().toString()
-        http.post(
-            uri = uri(),
-            headers = mapOf(
-                "Content-Type" to "application/json",
-                "X-Reference-Id" to userId,
-                "Ocp-Apim-Subscription-Key" to subscriptionKey
-            ),
-            requestPayload = mapOf(
-                "providerCallbackHost" to URL(callbackUrl).host
-            ),
-            responseType = Any::class.java
-        )
-        LOGGER.info("User#$userId created...")
+        try {
+            val userId = UUID.randomUUID().toString()
+            http.post(
+                uri = uri(),
+                headers = mapOf(
+                    "Content-Type" to "application/json",
+                    "X-Reference-Id" to userId,
+                    "Ocp-Apim-Subscription-Key" to subscriptionKey
+                ),
+                requestPayload = mapOf(
+                    "providerCallbackHost" to URL(callbackUrl).host
+                ),
+                responseType = Any::class.java
+            )
+            LOGGER.info("User#$userId created...")
 
-        // Get API Key
-        val apiKey = http.post(
-            uri = uri("/$userId/apikey"),
-            headers = mapOf(
-                "Content-Type" to "application/json",
-                "Ocp-Apim-Subscription-Key" to subscriptionKey
-            ),
-            requestPayload = emptyMap<String, String>(),
-            responseType = ApiKeyResponse::class.java
-        )!!.apiKey
-        LOGGER.info("User#$userId - apiKey=$apiKey")
+            // Get API Key
+            val apiKey = http.post(
+                uri = uri("/$userId/apikey"),
+                headers = mapOf(
+                    "Content-Type" to "application/json",
+                    "Ocp-Apim-Subscription-Key" to subscriptionKey
+                ),
+                requestPayload = emptyMap<String, String>(),
+                responseType = ApiKeyResponse::class.java
+            )!!.apiKey
+            LOGGER.info("User#$userId - apiKey=$apiKey")
 
-        return User(id = userId, apiKey = apiKey)
+            return User(id = userId, apiKey = apiKey)
+        } catch (ex: Throwable) {
+            LOGGER.error("Unable to resolve the user", ex)
+            throw ex
+        }
     }
 
     private fun uri(path: String = ""): String =

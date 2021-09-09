@@ -34,12 +34,12 @@ import javax.net.ssl.X509TrustManager
 open class MTNConfiguration(
     @Value("\${wutsi.platform.payment.mtn.environment}") private val environment: String,
     @Value("\${wutsi.platform.payment.mtn.callback-url}") private val callbackUrl: String,
-    @Value("\${wutsi.platform.payment.mtn.collection:subscription-key}") private val collectionSubscriptionKey: String,
-    @Value("\${wutsi.platform.payment.mtn.collection:user-id:}") private val collectionUserId: String,
-    @Value("\${wutsi.platform.payment.mtn.collection:api-key:}") private val collectionApiKey: String,
-    @Value("\${wutsi.platform.payment.mtn.disbursement:subscription-key}") private val disbursementSubscriptionKey: String,
-    @Value("\${wutsi.platform.payment.mtn.disbursement:user-id:}") private val disbursementUserId: String,
-    @Value("\${wutsi.platform.payment.mtn.disbursement:api-key:}") private val disbursementApiKey: String
+    @Value("\${wutsi.platform.payment.mtn.collection.subscription-key}") private val collectionSubscriptionKey: String,
+    @Value("\${wutsi.platform.payment.mtn.collection.user-id:}") private val collectionUserId: String,
+    @Value("\${wutsi.platform.payment.mtn.collection.api-key:}") private val collectionApiKey: String,
+    @Value("\${wutsi.platform.payment.mtn.disbursement.subscription-key}") private val disbursementSubscriptionKey: String,
+    @Value("\${wutsi.platform.payment.mtn.disbursement.user-id:}") private val disbursementUserId: String,
+    @Value("\${wutsi.platform.payment.mtn.disbursement.api-key:}") private val disbursementApiKey: String
 ) {
     @Bean
     open fun mtnGateway(): MTNGateway =
