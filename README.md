@@ -16,7 +16,8 @@
 ## MTN Spring Configuration
 | Property | Default Value | Description |
 |----------|---------------|-------------|
-| wutsi.platform.payment.mtn.collection.environment |  | REQUIRED. `sandbox` or `production` |
+| wutsi.platform.payment.mtn.enabled | false | `true` to enable MTN payment provider |
+| wutsi.platform.payment.mtn.environment |  | REQUIRED. `sandbox` or `production` |
 | wutsi.platform.payment.mtn.callback-url |  | REQUIRED. Callback URL |
 | wutsi.platform.payment.mtn.collection.subscription-key |  | REQUIRED. Subscription Key of the Collection API |
 | wutsi.platform.payment.mtn.collection.user-id |  | Collection User ID. REQUIRED in production environment |

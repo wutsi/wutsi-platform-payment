@@ -28,8 +28,8 @@ import javax.net.ssl.X509TrustManager
 
 @Configuration
 @ConditionalOnProperty(
-    value = ["wutsi.platform.payment.provider"],
-    havingValue = "mtn"
+    value = ["wutsi.platform.payment.mtn.enabled"],
+    havingValue = "true"
 )
 open class MTNConfiguration(
     @Value("\${wutsi.platform.payment.mtn.environment}") private val environment: String,
