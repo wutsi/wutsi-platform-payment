@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.boot.actuate.health.Status
 
-internal class ProductHealthIndicatorTest {
+internal class MTNProductHealthIndicatorTest {
     private lateinit var product: Product
     private lateinit var hc: HealthIndicator
 
     @BeforeEach
     fun setUp() {
         product = mock()
-        hc = MTNProductHealthIndicator(product)
+        hc = MTNProductHealthIndicator("sandbox", product)
     }
 
     @Test

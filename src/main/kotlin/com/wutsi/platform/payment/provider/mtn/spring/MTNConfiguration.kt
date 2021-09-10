@@ -12,6 +12,7 @@ import com.wutsi.platform.payment.provider.mtn.impl.UserProviderSandbox
 import com.wutsi.platform.payment.provider.mtn.product.Collection
 import com.wutsi.platform.payment.provider.mtn.product.Disbursment
 import com.wutsi.platform.payment.provider.mtn.product.ProductConfig
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -41,6 +42,10 @@ open class MTNConfiguration(
     @Value("\${wutsi.platform.payment.mtn.disbursement.user-id:}") private val disbursementUserId: String,
     @Value("\${wutsi.platform.payment.mtn.disbursement.api-key:}") private val disbursementApiKey: String
 ) {
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(MTNConfiguration::class.java)
+    }
+
     @Bean
     open fun mtnGateway(): MTNGateway =
         MTNGateway(
@@ -86,15 +91,25 @@ open class MTNConfiguration(
 
     @Bean
     open fun mtnCollectionHealthCheck(): HealthIndicator =
-        MTNProductHealthIndicator(mtnCollection())
+        MTNProductHealthIndicator(environment, mtnCollection())
 
     @Bean
     open fun mtnDisbursementHealthCheck(): HealthIndicator =
-        MTNProductHealthIndicator(mtnDisbursement())
+        MTNProductHealthIndicator(environment, mtnDisbursement())
 
     @Bean
     open fun mtnHttp(): Http {
-        if (mtnEnvironment() == SANDBOX) {
+        val env = mtnEnvironment()
+        LOGGER.info("Creating HttpClient for $env")
+        if (env == PRODUCTION) {
+            return Http(
+                client = HttpClient.newBuilder()
+                    .version(HTTP_1_1)
+                    .followRedirects(NORMAL)
+                    .build(),
+                objectMapper = ObjectMapper()
+            )
+        } else {
             val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
                 override fun getAcceptedIssuers(): Array<X509Certificate>? = null
                 override fun checkClientTrusted(certs: Array<X509Certificate>, authType: String) {}
@@ -104,18 +119,14 @@ open class MTNConfiguration(
             val context = SSLContext.getInstance("TLS")
             context.init(null, trustAllCerts, SecureRandom())
 
+            /*
+             * TODO: This is pretty bad to set it at JDK level. How to set it per client with JDK11 HttpClient?
+             */
+            System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true")
             return Http(
                 client = HttpClient.newBuilder()
                     .version(HTTP_1_1)
                     .sslContext(context)
-                    .followRedirects(NORMAL)
-                    .build(),
-                objectMapper = ObjectMapper()
-            )
-        } else {
-            return Http(
-                client = HttpClient.newBuilder()
-                    .version(HTTP_1_1)
                     .followRedirects(NORMAL)
                     .build(),
                 objectMapper = ObjectMapper()
@@ -129,11 +140,15 @@ open class MTNConfiguration(
         subscriptionKey: String,
         callbackUrl: String,
         http: Http
-    ): UserProvider =
-        if (mtnEnvironment() == PRODUCTION)
+    ): UserProvider {
+        val env = mtnEnvironment()
+        LOGGER.info("Creating UserProvider for $env")
+
+        return if (env == PRODUCTION)
             UserProviderProduction(userId, apiKey)
         else
             UserProviderSandbox(subscriptionKey, callbackUrl, http)
+    }
 
     private fun mtnEnvironment(): Environment =
         if (environment.equals("production", ignoreCase = true) || environment.equals("prod", ignoreCase = true))
