@@ -13,6 +13,7 @@
 |----------|---------------|-------------|
 | wutsi.platform.payment.provider |  | REQUIRED. Type of cache: `mtn` |
 
+
 ## MTN Spring Configuration
 | Property | Default Value | Description |
 |----------|---------------|-------------|
