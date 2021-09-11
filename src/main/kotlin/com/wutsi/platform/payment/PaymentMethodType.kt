@@ -1,6 +1,6 @@
 package com.wutsi.platform.payment
 
 enum class PaymentMethodType {
-    UNKNWON,
+    UNKNOWN,
     MOBILE_PAYMENT
 }
