@@ -110,7 +110,7 @@ internal class MTNGatewayTest {
 
         assertEquals(Status.PENDING, response.status)
         assertEquals(request.amount.value, response.amount.value)
-        assertEquals(request.amount.currency, response.amount.currency)
+        assertEquals("EUR", response.amount.currency)
         assertEquals(request.payerMessage, response.payerMessage)
         assertEquals(request.description, response.description)
         assertEquals(request.externalId, response.externalId)

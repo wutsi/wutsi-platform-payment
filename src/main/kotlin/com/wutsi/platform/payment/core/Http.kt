@@ -22,7 +22,6 @@ class Http(
         responseType: Class<T>,
         headers: Map<String, String?> = emptyMap()
     ): T? {
-        LOGGER.debug("GET $uri")
         val request = HttpRequest.newBuilder()
             .uri(URI(uri))
             .headers(headers)
@@ -30,6 +29,7 @@ class Http(
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        LOGGER.debug("GET $uri - ${response.statusCode()}")
         if (response.statusCode() / 100 == 2)
             return if (response.body().isEmpty())
                 null
@@ -45,7 +45,6 @@ class Http(
         responseType: Class<T>,
         headers: Map<String, String?> = emptyMap()
     ): T? {
-        LOGGER.debug("POST $uri")
         val request = HttpRequest.newBuilder()
             .uri(URI(uri))
             .headers(headers)
@@ -53,6 +52,7 @@ class Http(
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        LOGGER.debug("POST $uri - ${response.statusCode()}")
         if (response.statusCode() / 100 == 2)
             return if (response.body().isEmpty())
                 null
