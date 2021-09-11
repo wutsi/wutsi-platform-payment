@@ -6,7 +6,7 @@ import com.wutsi.platform.payment.core.Status
 data class GetPaymentResponse(
     val amount: Money = Money(),
     val payer: Party = Party(),
-    val status: Status = Status.STATUS_UNKNOWN,
+    val status: Status = Status.UNKNOWN,
     val description: String = "",
     val payerMessage: String? = null,
     val externalId: String = ""

@@ -10,7 +10,7 @@ import com.wutsi.platform.payment.provider.mtn.UserProvider
 import com.wutsi.platform.payment.provider.mtn.impl.UserProviderProduction
 import com.wutsi.platform.payment.provider.mtn.impl.UserProviderSandbox
 import com.wutsi.platform.payment.provider.mtn.product.Collection
-import com.wutsi.platform.payment.provider.mtn.product.Disbursment
+import com.wutsi.platform.payment.provider.mtn.product.Disbursement
 import com.wutsi.platform.payment.provider.mtn.product.ProductConfig
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -50,7 +50,7 @@ open class MTNConfiguration(
     open fun mtnGateway(): MTNGateway =
         MTNGateway(
             collection = mtnCollection(),
-            disbursment = mtnDisbursement()
+            disbursement = mtnDisbursement()
         )
 
     @Bean
@@ -72,8 +72,8 @@ open class MTNConfiguration(
         )
 
     @Bean
-    open fun mtnDisbursement(): Disbursment =
-        Disbursment(
+    open fun mtnDisbursement(): Disbursement =
+        Disbursement(
             http = mtnHttp(),
             config = ProductConfig(
                 environment = mtnEnvironment(),

@@ -5,7 +5,7 @@ import com.wutsi.platform.payment.provider.mtn.model.TokenResponse
 import java.util.Base64
 
 abstract class AbstractProduct(
-    protected val config: ProductConfig,
+    val config: ProductConfig,
     protected val http: Http
 ) : Product {
     protected abstract fun uri(path: String): String

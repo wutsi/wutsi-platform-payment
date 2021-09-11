@@ -11,7 +11,7 @@ import com.wutsi.platform.payment.model.CreatePaymentRequest
 import com.wutsi.platform.payment.model.CreateTransferRequest
 import com.wutsi.platform.payment.model.Party
 import com.wutsi.platform.payment.provider.mtn.product.Collection
-import com.wutsi.platform.payment.provider.mtn.product.Disbursment
+import com.wutsi.platform.payment.provider.mtn.product.Disbursement
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -23,12 +23,12 @@ internal class MTNGatewayTest {
 
     @Test
     fun type() {
-        assertEquals(PaymentMethodType.PAYMENT_METHOD_TYPE_MOBILE_PAYMENT, gateway.type())
+        assertEquals(PaymentMethodType.MOBILE_PAYMENT, gateway.type())
     }
 
     @Test
     fun provider() {
-        assertEquals(PaymentMethodProvider.PAYMENT_METHOD_PROVIDER_MTN, gateway.provider())
+        assertEquals(PaymentMethodProvider.MTN, gateway.provider())
     }
 
     @Test
@@ -37,7 +37,7 @@ internal class MTNGatewayTest {
         val response = gateway.createPayment(request)
 
         assertNotNull(response.transactionId)
-        assertEquals(Status.STATUS_SUCCESS, response.status)
+        assertEquals(Status.SUCCESSFUL, response.status)
     }
 
     @Test
@@ -73,7 +73,7 @@ internal class MTNGatewayTest {
         val resp = gateway.createPayment(request)
         val response = gateway.getPayment(resp.transactionId)
 
-        assertEquals(Status.STATUS_PENDING, response.status)
+        assertEquals(Status.PENDING, response.status)
         assertEquals(request.amount.value, response.amount.value)
         assertEquals(request.amount.currency, response.amount.currency)
         assertEquals(request.payerMessage, response.payerMessage)
@@ -87,7 +87,7 @@ internal class MTNGatewayTest {
         val response = gateway.createTransfer(request)
 
         assertNotNull(response.transactionId)
-        assertEquals(Status.STATUS_SUCCESS, response.status)
+        assertEquals(Status.SUCCESSFUL, response.status)
     }
 
     @Test
@@ -108,7 +108,7 @@ internal class MTNGatewayTest {
         val resp = gateway.createTransfer(request)
         val response = gateway.getTransfer(resp.transactionId)
 
-        assertEquals(Status.STATUS_PENDING, response.status)
+        assertEquals(Status.PENDING, response.status)
         assertEquals(request.amount.value, response.amount.value)
         assertEquals(request.amount.currency, response.amount.currency)
         assertEquals(request.payerMessage, response.payerMessage)
@@ -122,7 +122,7 @@ internal class MTNGatewayTest {
                 config = Fixtures.createCollectionConfig(),
                 http = Fixtures.createHttp()
             ),
-            disbursment = Disbursment(
+            disbursement = Disbursement(
                 config = Fixtures.createDisbursementConfig(),
                 http = Fixtures.createHttp()
             )

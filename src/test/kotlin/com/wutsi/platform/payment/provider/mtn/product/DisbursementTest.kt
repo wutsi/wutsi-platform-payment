@@ -74,8 +74,8 @@ internal class DisbursementTest {
     private fun createProduct(
         config: ProductConfig = Fixtures.createDisbursementConfig(),
         http: Http = Fixtures.createHttp()
-    ): Disbursment =
-        Disbursment(config, http)
+    ): Disbursement =
+        Disbursement(config, http)
 
     private fun createRequest(number: String) = TransferRequest(
         payeeNote = "Yo man",

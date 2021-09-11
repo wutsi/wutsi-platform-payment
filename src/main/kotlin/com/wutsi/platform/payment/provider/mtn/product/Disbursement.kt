@@ -4,7 +4,7 @@ import com.wutsi.platform.payment.core.Http
 import com.wutsi.platform.payment.provider.mtn.model.TransferRequest
 import com.wutsi.platform.payment.provider.mtn.model.TransferResponse
 
-open class Disbursment(
+open class Disbursement(
     config: ProductConfig,
     http: Http
 ) : AbstractProduct(config, http) {
