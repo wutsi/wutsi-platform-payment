@@ -107,7 +107,8 @@ open class MTNConfiguration(
                     .version(HTTP_1_1)
                     .followRedirects(NORMAL)
                     .build(),
-                objectMapper = ObjectMapper()
+                objectMapper = ObjectMapper(),
+                logPayload = false
             )
         } else {
             val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
@@ -129,7 +130,8 @@ open class MTNConfiguration(
                     .sslContext(context)
                     .followRedirects(NORMAL)
                     .build(),
-                objectMapper = ObjectMapper()
+                objectMapper = ObjectMapper(),
+                logPayload = true
             )
         }
     }

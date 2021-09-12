@@ -11,7 +11,8 @@ import java.net.http.HttpResponse
 
 class Http(
     private val client: HttpClient,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val logPayload: Boolean
 ) {
     companion object {
         private val LOGGER = LoggerFactory.getLogger(Http::class.java)
@@ -29,12 +30,14 @@ class Http(
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        LOGGER.debug("GET $uri - ${response.statusCode()}")
+        log("POST", uri, null, response)
         if (response.statusCode() / 100 == 2)
             return if (response.body().isEmpty())
                 null
-            else
-                objectMapper.readValue(response.body(), responseType)
+            else {
+                val responsePayload = objectMapper.readValue(response.body(), responseType)
+                return responsePayload
+            }
         else
             throw HttpException(response.statusCode(), response.body())
     }
@@ -52,7 +55,7 @@ class Http(
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        LOGGER.debug("POST $uri - ${response.statusCode()}")
+        log("POST", uri, requestPayload, response)
         if (response.statusCode() / 100 == 2)
             return if (response.body().isEmpty())
                 null
@@ -60,6 +63,17 @@ class Http(
                 objectMapper.readValue(response.body(), responseType)
         else
             throw HttpException(response.statusCode(), response.body())
+    }
+
+    private fun log(method: String, uri: String, requestPayload: Any?, response: HttpResponse<String>) {
+        LOGGER.debug("$method $uri - ${response.statusCode()}")
+        if (!logPayload)
+            return
+
+        if (requestPayload != null)
+            LOGGER.debug("  Request: $requestPayload")
+        if (response.body().isNotEmpty())
+            LOGGER.debug("  Response: ${response.body()}")
     }
 
     private fun Builder.headers(headers: Map<String, String?>): Builder {

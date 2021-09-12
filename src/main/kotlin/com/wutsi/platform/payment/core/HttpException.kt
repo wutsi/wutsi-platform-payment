@@ -7,5 +7,5 @@ class HttpException(
     cause: Exception? = null
 ) : RuntimeException(message, cause) {
     override val message: String
-        get() = "$statusCode - $bodyString"
+        get() = "$statusCode - $bodyString" + super.message?.let { "\n$it" }
 }
