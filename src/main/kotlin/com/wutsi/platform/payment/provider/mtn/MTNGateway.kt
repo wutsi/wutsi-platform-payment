@@ -64,8 +64,9 @@ class MTNGateway(
             val status = toStatus(response.status)
             if (status == PENDING || status == SUCCESSFUL)
                 return CreatePaymentResponse(
+                    status = toStatus(response.status),
                     transactionId = transactionId,
-                    status = toStatus(response.status)
+                    financialTransactionId = response.financialTransactionId
                 )
             else
                 throw PaymentException(
@@ -99,7 +100,8 @@ class MTNGateway(
                 status = status,
                 description = response.payeeNote,
                 payerMessage = response.payerMessage,
-                externalId = response.externalId
+                externalId = response.externalId,
+                financialTransactionId = response.financialTransactionId
             )
         else
             throw PaymentException(

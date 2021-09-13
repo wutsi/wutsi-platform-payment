@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 
 internal class MTNGatewayTest {
     private val gateway: Gateway = createGateway()
@@ -38,6 +39,7 @@ internal class MTNGatewayTest {
 
         assertNotNull(response.transactionId)
         assertEquals(Status.SUCCESSFUL, response.status)
+        assertNotNull(response.financialTransactionId)
     }
 
     @Test
@@ -68,7 +70,7 @@ internal class MTNGatewayTest {
     }
 
     @Test
-    fun `get payment information`() {
+    fun `get payment information of PENDING transaction`() {
         val request = createCreatePaymentRequest(Fixtures.NUMBER_PENDING)
         val resp = gateway.createPayment(request)
         val response = gateway.getPayment(resp.transactionId)
@@ -79,6 +81,22 @@ internal class MTNGatewayTest {
         assertEquals(request.payerMessage, response.payerMessage)
         assertEquals(request.description, response.description)
         assertEquals(request.externalId, response.externalId)
+        assertNull(response.financialTransactionId)
+    }
+
+    @Test
+    fun `get payment information of SUCESSFULL transaction`() {
+        val request = createCreatePaymentRequest(Fixtures.NUMBER_SUCCESS)
+        val resp = gateway.createPayment(request)
+        val response = gateway.getPayment(resp.transactionId)
+
+        assertEquals(Status.SUCCESSFUL, response.status)
+        assertEquals(request.amount.value, response.amount.value)
+        assertEquals("EUR", response.amount.currency)
+        assertEquals(request.payerMessage, response.payerMessage)
+        assertEquals(request.description, response.description)
+        assertEquals(request.externalId, response.externalId)
+        assertNotNull(response.financialTransactionId)
     }
 
     @Test

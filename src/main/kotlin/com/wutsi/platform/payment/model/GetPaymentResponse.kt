@@ -9,5 +9,6 @@ data class GetPaymentResponse(
     val status: Status = Status.UNKNOWN,
     val description: String = "",
     val payerMessage: String? = null,
-    val externalId: String = ""
+    val externalId: String = "",
+    val financialTransactionId: String? = null
 )
