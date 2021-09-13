@@ -4,7 +4,7 @@
 
   <artifactId>wutsi-platform-payment</artifactId>
   <groupId>com.wutsi</groupId>
-  <version>0.0.31-SNAPSHOT</version>
+  <version>0.0.31</version>
   <packaging>jar</packaging>
 
   <name>wutsi-platform-payment</name>
@@ -34,7 +34,7 @@
 
   <scm>
     <developerConnection>scm:git:https://github.com/wutsi/wutsi-platform-payment.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>wutsi-platform-payment-0.0.31</tag>
   </scm>
   <distributionManagement>
     <repository>
