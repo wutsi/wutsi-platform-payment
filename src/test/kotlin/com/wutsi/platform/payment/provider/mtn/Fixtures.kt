@@ -16,8 +16,8 @@ import javax.net.ssl.X509TrustManager
 
 object Fixtures {
     const val CALLBACK_URL = "http://127.0.0.1/mtn/callback"
-    const val COLLECTION_SUBSCRIPTION_KEY = "f54b576eb6514e8b8dda657402d2db4c" // account: h...@wutsi.com
-    const val DISBURSEMENT_SUBSCRIPTION_KEY = "ae3a40f49d0f4c87b44cf62da406dd26" // account: h...@wutsi.com
+    const val COLLECTION_SUBSCRIPTION_KEY = "8f69aa83ec244a82b9b3006dbb91dead" // h...@gmail.com
+    const val DISBURSEMENT_SUBSCRIPTION_KEY = "575487abb6b44f508eb102d5b002dd69" // h...@gmail.com
     const val NUMBER_PENDING = "46733123454"
     const val NUMBER_TIMEOUT = "46733123452"
     const val NUMBER_REJECTED = "46733123451"
