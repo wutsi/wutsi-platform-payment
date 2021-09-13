@@ -71,7 +71,7 @@ class Http(
             return
 
         if (requestPayload != null)
-            LOGGER.debug("  Request: $requestPayload")
+            LOGGER.debug("  Request: " + objectMapper.writeValueAsString(requestPayload))
         if (response.body().isNotEmpty())
             LOGGER.debug("  Response: ${response.body()}")
     }
