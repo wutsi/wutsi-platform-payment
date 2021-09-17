@@ -105,6 +105,7 @@ internal class MTNGatewayTest {
         val response = gateway.createTransfer(request)
 
         assertNotNull(response.transactionId)
+        assertNotNull(response.financialTransactionId)
         assertEquals(Status.SUCCESSFUL, response.status)
     }
 

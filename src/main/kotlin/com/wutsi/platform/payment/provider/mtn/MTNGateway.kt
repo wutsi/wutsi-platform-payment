@@ -137,6 +137,7 @@ class MTNGateway(
             if (status == PENDING || status == SUCCESSFUL)
                 return CreateTransferResponse(
                     transactionId = transactionId,
+                    financialTransactionId = response.financialTransactionId,
                     status = toStatus(response.status)
                 )
             else
