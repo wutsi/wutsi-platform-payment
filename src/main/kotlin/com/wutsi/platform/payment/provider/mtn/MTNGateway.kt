@@ -66,7 +66,7 @@ class MTNGateway(
                 return CreatePaymentResponse(
                     status = toStatus(response.status),
                     transactionId = transactionId,
-                    financialTransactionId = response.financialTransactionId
+                    financialTransactionId = response.financialTransactionId?.ifBlank { null }
                 )
             else
                 throw PaymentException(
@@ -101,7 +101,7 @@ class MTNGateway(
                 description = response.payeeNote,
                 payerMessage = response.payerMessage,
                 externalId = response.externalId,
-                financialTransactionId = response.financialTransactionId
+                financialTransactionId = response.financialTransactionId?.ifBlank { null }
             )
         else
             throw PaymentException(
@@ -137,7 +137,7 @@ class MTNGateway(
             if (status == PENDING || status == SUCCESSFUL)
                 return CreateTransferResponse(
                     transactionId = transactionId,
-                    financialTransactionId = response.financialTransactionId,
+                    financialTransactionId = response.financialTransactionId?.ifBlank { null },
                     status = toStatus(response.status)
                 )
             else
@@ -170,7 +170,8 @@ class MTNGateway(
                 status = status,
                 description = response.payeeNote,
                 payerMessage = response.payerMessage,
-                externalId = response.externalId
+                externalId = response.externalId,
+                financialTransactionId = response.financialTransactionId?.ifBlank { null }
             )
         else
             throw PaymentException(

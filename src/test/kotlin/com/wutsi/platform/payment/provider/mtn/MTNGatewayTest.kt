@@ -122,7 +122,7 @@ internal class MTNGatewayTest {
     }
 
     @Test
-    fun `get transfer information`() {
+    fun `get transfer information - PENDING`() {
         val request = createCreateTransferRequest(Fixtures.NUMBER_PENDING)
         val resp = gateway.createTransfer(request)
         val response = gateway.getTransfer(resp.transactionId)
@@ -133,6 +133,19 @@ internal class MTNGatewayTest {
         assertEquals(request.payerMessage, response.payerMessage)
         assertEquals(request.description, response.description)
         assertEquals(request.externalId, response.externalId)
+        assertNull(response.financialTransactionId)
+    }
+
+    @Test
+    fun `get transfer information - FAILURE`() {
+        val request = createCreateTransferRequest(Fixtures.NUMBER_TIMEOUT)
+        val ex = assertThrows<PaymentException> {
+            gateway.createTransfer(request)
+        }
+
+        assertEquals(ErrorCode.EXPIRED, ex.error.code)
+        assertNotNull(ex.error.transactionId)
+        assertEquals("EXPIRED", ex.error.supplierErrorCode)
     }
 
     private fun createGateway() =

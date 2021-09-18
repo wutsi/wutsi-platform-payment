@@ -10,5 +10,6 @@ data class GetTransferResponse(
     val externalId: String = "",
     val description: String = "",
     val payerMessage: String? = null,
-    val status: Status = UNKNOWN
+    val status: Status = UNKNOWN,
+    val financialTransactionId: String? = null
 )
