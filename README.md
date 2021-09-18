@@ -25,5 +25,5 @@
 | wutsi.platform.payment.mtn.collection.api-key |  | Collection API Key. REDIURED in production environment |
 | wutsi.platform.payment.mtn.disbursement.subscription-key |  | REQUIRED. Subscription Key of the Disbursement API |
 | wutsi.platform.payment.mtn.disbursement.user-id |  | Disbursement User ID. REQUIRED in production environment |
-| wutsi.platform.payment.mtn.disbursement.api-key |  | Disbursement API Key. REDIURED in production environment |
+| wutsi.platform.payment.mtn.disbursement.api-key |  | Disbursement API Key. REQUIRED in production environment |
 
