@@ -202,7 +202,6 @@ class MTNGateway(
                     code = AUTHENTICATION_FAILED,
                     transactionId = transactionId
                 ),
-                ex.message,
                 ex
             )
         else
@@ -211,7 +210,6 @@ class MTNGateway(
                     code = UNEXPECTED_ERROR,
                     transactionId = transactionId
                 ),
-                ex.message,
                 ex
             )
 }
