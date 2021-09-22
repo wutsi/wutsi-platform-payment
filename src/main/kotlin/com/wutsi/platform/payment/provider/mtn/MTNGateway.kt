@@ -54,7 +54,7 @@ class MTNGateway(
                 request = RequestToPayRequest(
                     amount = request.amount.value.toString(),
                     currency = currency(collection.config, request.amount.currency),
-                    payer = Party(request.payer.phoneNumber),
+                    payer = Party(toPhoneNumber(request.payer.phoneNumber)),
                     payeeNote = request.description,
                     externalId = request.externalId,
                     payerMessage = request.payerMessage ?: ""
@@ -126,7 +126,7 @@ class MTNGateway(
                 request = TransferRequest(
                     amount = request.amount.value.toString(),
                     currency = currency(disbursement.config, request.amount.currency),
-                    payee = Party(request.payee.phoneNumber),
+                    payee = Party(toPhoneNumber(request.payee.phoneNumber)),
                     payeeNote = request.description,
                     externalId = request.externalId,
                     payerMessage = request.payerMessage ?: ""
@@ -188,6 +188,12 @@ class MTNGateway(
             "EUR"
         else
             currency
+
+    private fun toPhoneNumber(number: String): String =
+        if (number.startsWith("+"))
+            number.substring(1)
+        else
+            number
 
     private fun toStatus(status: String): Status =
         Status.valueOf(status)
