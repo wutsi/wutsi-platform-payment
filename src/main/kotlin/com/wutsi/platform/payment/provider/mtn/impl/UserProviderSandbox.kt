@@ -34,6 +34,7 @@ class UserProviderSandbox(
         try {
             val userId = UUID.randomUUID().toString()
             http.post(
+                referenceId = userId,
                 uri = uri(),
                 headers = mapOf(
                     "Content-Type" to "application/json",
@@ -49,6 +50,7 @@ class UserProviderSandbox(
 
             // Get API Key
             val apiKey = http.post(
+                referenceId = userId,
                 uri = uri("/$userId/apikey"),
                 headers = mapOf(
                     "Content-Type" to "application/json",

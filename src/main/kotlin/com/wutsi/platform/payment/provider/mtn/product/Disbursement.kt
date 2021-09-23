@@ -14,6 +14,7 @@ open class Disbursement(
         request: TransferRequest
     ) {
         http.post(
+            referenceId = referenceId,
             uri = uri("v1_0/transfer"),
             requestPayload = request,
             headers = headers(referenceId, accessToken),
@@ -23,6 +24,7 @@ open class Disbursement(
 
     fun transfer(referenceId: String, accessToken: String) =
         http.get(
+            referenceId = referenceId,
             uri = uri("v1_0/transfer/$referenceId"),
             headers = headers(referenceId, accessToken),
             responseType = TransferResponse::class.java

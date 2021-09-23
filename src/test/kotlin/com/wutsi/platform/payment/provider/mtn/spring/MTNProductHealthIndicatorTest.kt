@@ -1,5 +1,6 @@
 package com.wutsi.platform.payment.provider.mtn.spring
 
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.mock
@@ -24,7 +25,7 @@ internal class MTNProductHealthIndicatorTest {
 
     @Test
     fun up() {
-        doReturn(TokenResponse("")).whenever(product).token()
+        doReturn(TokenResponse("")).whenever(product).token(any())
         val result = hc.health()
 
         assertEquals(Status.UP, result.status)
@@ -32,7 +33,7 @@ internal class MTNProductHealthIndicatorTest {
 
     @Test
     fun down() {
-        doThrow(RuntimeException::class).whenever(product).token()
+        doThrow(RuntimeException::class).whenever(product).token(any())
         val result = hc.health()
 
         assertEquals(Status.DOWN, result.status)

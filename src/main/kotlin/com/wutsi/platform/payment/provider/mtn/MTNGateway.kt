@@ -46,8 +46,7 @@ class MTNGateway(
 
         val transactionId = UUID.randomUUID().toString()
         try {
-
-            val accessToken = collection.token().access_token
+            val accessToken = collection.token(transactionId).access_token
             collection.requestToPay(
                 referenceId = transactionId,
                 accessToken = accessToken,
@@ -84,7 +83,7 @@ class MTNGateway(
     override fun getPayment(transactionId: String): GetPaymentResponse {
         LOGGER.info("Retrieving payment $transactionId")
 
-        val accessToken = collection.token().access_token
+        val accessToken = collection.token(transactionId).access_token
         val response = collection.requestToPay(transactionId, accessToken)
         val status = toStatus(response.status)
 
@@ -119,7 +118,7 @@ class MTNGateway(
         val transactionId = UUID.randomUUID().toString()
         try {
 
-            val accessToken = disbursement.token().access_token
+            val accessToken = disbursement.token(transactionId).access_token
             disbursement.transfer(
                 referenceId = transactionId,
                 accessToken = accessToken,
@@ -154,7 +153,7 @@ class MTNGateway(
     }
 
     override fun getTransfer(transactionId: String): GetTransferResponse {
-        val accessToken = disbursement.token().access_token
+        val accessToken = disbursement.token(transactionId).access_token
         val response = disbursement.transfer(transactionId, accessToken)
         val status = toStatus(response.status)
 

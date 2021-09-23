@@ -14,6 +14,7 @@ open class Collection(
         request: RequestToPayRequest
     ) {
         http.post(
+            referenceId = referenceId,
             uri = uri("v1_0/requesttopay"),
             requestPayload = request,
             headers = headers(referenceId, accessToken),
@@ -23,6 +24,7 @@ open class Collection(
 
     fun requestToPay(referenceId: String, accessToken: String) =
         http.get(
+            referenceId = referenceId,
             uri = uri("v1_0/requesttopay/$referenceId"),
             headers = headers(null, accessToken),
             responseType = RequestToPayResponse::class.java

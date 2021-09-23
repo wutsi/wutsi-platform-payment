@@ -10,8 +10,9 @@ abstract class AbstractProduct(
 ) : Product {
     protected abstract fun uri(path: String): String
 
-    override fun token(): TokenResponse =
+    override fun token(referenceId: String): TokenResponse =
         http.post(
+            referenceId = referenceId,
             uri = uri("token"),
             headers = mapOf(
                 "Content-Type" to "application/json",

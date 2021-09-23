@@ -1,6 +1,7 @@
 package com.wutsi.platform.payment.provider.mtn.spring
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.wutsi.platform.payment.core.DefaultHttpListener
 import com.wutsi.platform.payment.core.Http
 import com.wutsi.platform.payment.provider.mtn.Environment
 import com.wutsi.platform.payment.provider.mtn.Environment.PRODUCTION
@@ -108,7 +109,7 @@ open class MTNConfiguration(
                     .followRedirects(NORMAL)
                     .build(),
                 objectMapper = ObjectMapper(),
-                logPayload = false
+                listener = DefaultHttpListener()
             )
         } else {
             val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
@@ -130,8 +131,7 @@ open class MTNConfiguration(
                     .sslContext(context)
                     .followRedirects(NORMAL)
                     .build(),
-                objectMapper = ObjectMapper(),
-                logPayload = true
+                objectMapper = ObjectMapper()
             )
         }
     }

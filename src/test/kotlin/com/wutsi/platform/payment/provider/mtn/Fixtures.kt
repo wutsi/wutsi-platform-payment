@@ -60,8 +60,7 @@ object Fixtures {
                 .sslContext(context)
                 .followRedirects(NORMAL)
                 .build(),
-            objectMapper = ObjectMapper(),
-            logPayload = true
+            objectMapper = ObjectMapper()
         )
     }
 }
