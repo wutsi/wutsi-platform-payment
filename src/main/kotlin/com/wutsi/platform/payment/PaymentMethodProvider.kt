@@ -8,6 +8,6 @@ enum class PaymentMethodProvider(
 ) {
     UNKNOWN("", PaymentMethodType.UNKNOWN),
     MTN("MTN", MOBILE),
-    ORANGE("Orange Mobile", MOBILE),
+    ORANGE("Orange", MOBILE),
     NEXTTEL("Nexttel", MOBILE)
 }
