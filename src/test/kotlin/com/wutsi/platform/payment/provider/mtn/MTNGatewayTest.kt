@@ -3,7 +3,6 @@ package com.wutsi.platform.payment.provider.mtn
 import com.wutsi.platform.payment.Gateway
 import com.wutsi.platform.payment.PaymentException
 import com.wutsi.platform.payment.PaymentMethodProvider
-import com.wutsi.platform.payment.PaymentMethodType
 import com.wutsi.platform.payment.core.ErrorCode
 import com.wutsi.platform.payment.core.Money
 import com.wutsi.platform.payment.core.Status
@@ -21,11 +20,6 @@ import kotlin.test.assertNull
 
 internal class MTNGatewayTest {
     private val gateway: Gateway = createGateway()
-
-    @Test
-    fun type() {
-        assertEquals(PaymentMethodType.MOBILE_PAYMENT, gateway.type())
-    }
 
     @Test
     fun provider() {

@@ -3,7 +3,6 @@ package com.wutsi.platform.payment.provider.mtn
 import com.wutsi.platform.payment.Gateway
 import com.wutsi.platform.payment.PaymentException
 import com.wutsi.platform.payment.PaymentMethodProvider.MTN
-import com.wutsi.platform.payment.PaymentMethodType.MOBILE_PAYMENT
 import com.wutsi.platform.payment.core.Error
 import com.wutsi.platform.payment.core.ErrorCode
 import com.wutsi.platform.payment.core.ErrorCode.AUTHENTICATION_FAILED
@@ -36,8 +35,6 @@ class MTNGateway(
     companion object {
         private val LOGGER = LoggerFactory.getLogger(MTNGateway::class.java)
     }
-
-    override fun type() = MOBILE_PAYMENT
 
     override fun provider() = MTN
 

@@ -1,7 +1,13 @@
 package com.wutsi.platform.payment
 
-enum class PaymentMethodProvider {
-    UNKNOWN,
-    MTN,
-    ORANGE
+import com.wutsi.platform.payment.PaymentMethodType.MOBILE
+
+enum class PaymentMethodProvider(
+    val displayName: String,
+    val paymentType: PaymentMethodType
+) {
+    UNKNOWN("", PaymentMethodType.UNKNOWN),
+    MTN("MTN", MOBILE),
+    ORANGE("Orange Mobile", MOBILE),
+    NEXTTEL("Nexttel", MOBILE)
 }
