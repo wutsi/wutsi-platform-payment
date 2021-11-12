@@ -28,7 +28,7 @@ import com.wutsi.platform.payment.provider.mtn.product.ProductConfig
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-class MTNGateway(
+open class MTNGateway(
     private val collection: Collection,
     private val disbursement: Disbursement
 ) : Gateway {
