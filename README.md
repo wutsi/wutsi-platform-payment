@@ -8,12 +8,7 @@
 
 `wutsi-platform-payment` is a library that provide payment API for:
 - MTN
-
-## Spring Configuration
-| Property | Default Value | Description |
-|----------|---------------|-------------|
-| wutsi.platform.payment.provider |  | REQUIRED. Type of cache: `mtn` |
-
+- Orange Money (OM)
 
 ## MTN Spring Configuration
 | Property | Default Value | Description |
@@ -28,3 +23,7 @@
 | wutsi.platform.payment.mtn.disbursement.user-id |  | Disbursement User ID. REQUIRED in production environment |
 | wutsi.platform.payment.mtn.disbursement.api-key |  | Disbursement API Key. REQUIRED in production environment |
 
+## Orange Spring Configuration
+| Property | Default Value | Description |
+|----------|---------------|-------------|
+| wutsi.platform.payment.om.enabled | false | `true` to enable Orange Money payment provider |

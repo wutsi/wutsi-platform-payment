@@ -8,7 +8,7 @@ import java.util.UUID
 
 class MTNProductHealthIndicator(
     private val environment: String,
-    private val collection: Product
+    private val product: Product
 ) : HealthIndicator {
     companion object {
         private val LOGGER = LoggerFactory.getLogger(MTNProductHealthIndicator::class.java)
@@ -17,7 +17,7 @@ class MTNProductHealthIndicator(
     override fun health(): Health {
         val now = System.currentTimeMillis()
         try {
-            collection.token(UUID.randomUUID().toString())
+            product.token(UUID.randomUUID().toString())
             return Health.up()
                 .withDetail("environment", environment)
                 .withDetail("durationMillis", System.currentTimeMillis() - now)
