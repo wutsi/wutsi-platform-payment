@@ -14,10 +14,10 @@
     <jacoco.threshold.line>0.85</jacoco.threshold.line>
     <jacoco.threshold.class>0.85</jacoco.threshold.class>
 
-    <jackson.version>2.12.5</jackson.version>
-    <junit.version>5.7.2</junit.version>
-    <klint.version>0.42.1</klint.version>
-    <kotlin.version>1.5.30</kotlin.version>
+    <jackson.version>2.13.0</jackson.version>
+    <junit.version>5.8.1</junit.version>
+    <klint.version>0.43.0</klint.version>
+    <kotlin.version>1.5.31</kotlin.version>
     <kotlin-ktlint.version>0.38.1</kotlin-ktlint.version>
     <kotlin-mockito.version>2.2.0</kotlin-mockito.version>
     <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
@@ -26,7 +26,7 @@
     <maven-jacoco-plugin.version>0.8.7</maven-jacoco-plugin.version>
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     <slf4j.version>1.7.32</slf4j.version>
-    <spring-boot.version>2.5.4</spring-boot.version>
+    <spring-boot.version>2.5.5</spring-boot.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <kotlin.code.style>official</kotlin.code.style>
