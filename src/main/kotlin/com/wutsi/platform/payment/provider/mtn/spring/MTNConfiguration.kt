@@ -1,6 +1,7 @@
 package com.wutsi.platform.payment.provider.mtn.spring
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.wutsi.platform.payment.GatewayProvider
 import com.wutsi.platform.payment.core.DefaultHttpListener
 import com.wutsi.platform.payment.core.Http
 import com.wutsi.platform.payment.provider.mtn.Environment
@@ -34,6 +35,8 @@ import javax.net.ssl.X509TrustManager
     havingValue = "true"
 )
 open class MTNConfiguration(
+    private val gatewayProvider: GatewayProvider,
+
     @Value("\${wutsi.platform.payment.mtn.environment}") private val environment: String,
     @Value("\${wutsi.platform.payment.mtn.callback-url}") private val callbackUrl: String,
     @Value("\${wutsi.platform.payment.mtn.collection.subscription-key}") private val collectionSubscriptionKey: String,
@@ -48,11 +51,14 @@ open class MTNConfiguration(
     }
 
     @Bean
-    open fun mtnGateway(): MTNGateway =
-        MTNGateway(
+    open fun mtnGateway(): MTNGateway {
+        val gateway = MTNGateway(
             collection = mtnCollection(),
             disbursement = mtnDisbursement()
         )
+        gatewayProvider.register(gateway)
+        return gateway
+    }
 
     @Bean
     open fun mtnCollection(): Collection =
