@@ -39,17 +39,20 @@ open class OMGateway : Gateway {
 
     override fun getPayment(transactionId: String): GetPaymentResponse {
         val status = getStatus(transactionId)
-        return if (status == Status.FAILED)
-            GetPaymentResponse(
-                status = Status.FAILED,
-                externalId = transactionId,
+        if (status == Status.FAILED)
+            throw PaymentException(
+                error = Error(
+                    transactionId = transactionId,
+                    code = ErrorCode.PAYMENT_NOT_APPROVED,
+                    supplierErrorCode = UUID.randomUUID().toString()
+                )
             )
-        else
-            GetPaymentResponse(
-                status = Status.SUCCESSFUL,
-                externalId = transactionId,
-                financialTransactionId = UUID.randomUUID().toString()
-            )
+
+        return GetPaymentResponse(
+            status = Status.SUCCESSFUL,
+            externalId = transactionId,
+            financialTransactionId = UUID.randomUUID().toString()
+        )
     }
 
     override fun createTransfer(request: CreateTransferRequest): CreateTransferResponse {
@@ -73,17 +76,20 @@ open class OMGateway : Gateway {
 
     override fun getTransfer(transactionId: String): GetTransferResponse {
         val status = getStatus(transactionId)
-        return if (status == Status.FAILED)
-            GetTransferResponse(
-                status = Status.FAILED,
-                externalId = transactionId,
+        if (status == Status.FAILED)
+            throw PaymentException(
+                error = Error(
+                    transactionId = transactionId,
+                    code = ErrorCode.PAYMENT_NOT_APPROVED,
+                    supplierErrorCode = UUID.randomUUID().toString()
+                )
             )
-        else
-            GetTransferResponse(
-                status = Status.SUCCESSFUL,
-                externalId = transactionId,
-                financialTransactionId = UUID.randomUUID().toString()
-            )
+
+        return GetTransferResponse(
+            status = Status.SUCCESSFUL,
+            externalId = transactionId,
+            financialTransactionId = UUID.randomUUID().toString()
+        )
     }
 
     private fun getStatus(transactionId: String): Status {
