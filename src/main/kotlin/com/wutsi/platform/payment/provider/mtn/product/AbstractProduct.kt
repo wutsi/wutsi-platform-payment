@@ -28,7 +28,7 @@ abstract class AbstractProduct(
         "Authorization" to "Bearer $accessToken",
         "X-Callback-Url" to config.callbackUrl,
         "X-Reference-Id" to referenceId,
-        "X-Target-Environment" to config.environment.name.toLowerCase(),
+        "X-Target-Environment" to config.environment.name.lowercase(),
         "Ocp-Apim-Subscription-Key" to config.subscriptionKey
     )
 
