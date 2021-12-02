@@ -13,6 +13,7 @@ import com.wutsi.platform.payment.provider.mtn.product.Collection
 import com.wutsi.platform.payment.provider.mtn.product.Disbursement
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertFalse
@@ -20,6 +21,11 @@ import kotlin.test.assertNull
 
 internal class MTNGatewayTest {
     private val gateway: Gateway = createGateway()
+
+    @BeforeEach
+    fun setUp() {
+        Thread.sleep(5000) // Sleep to prevent 429 error
+    }
 
     @Test
     fun provider() {
