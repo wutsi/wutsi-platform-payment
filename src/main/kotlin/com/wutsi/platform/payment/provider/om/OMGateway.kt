@@ -12,8 +12,8 @@ import com.wutsi.platform.payment.model.CreateTransferRequest
 import com.wutsi.platform.payment.model.CreateTransferResponse
 import com.wutsi.platform.payment.model.GetPaymentResponse
 import com.wutsi.platform.payment.model.GetTransferResponse
-import java.math.BigInteger
 import java.util.UUID
+import kotlin.math.abs
 
 open class OMGateway : Gateway {
     override fun provider() = ORANGE
@@ -93,11 +93,11 @@ open class OMGateway : Gateway {
     }
 
     private fun getStatus(transactionId: String): Status {
-        val bigInt = BigInteger(transactionId, 16)
-        val bucket = bigInt.toLong() % 17
-        if (bucket < 5) {
+        val value = UUID.fromString(transactionId).leastSignificantBits
+        val bucket = abs(value) % 10
+        if (bucket < 4) {
             return Status.SUCCESSFUL
-        } else if (bucket <= 10) {
+        } else if (bucket <= 7) {
             return Status.PENDING
         } else {
             return Status.FAILED
