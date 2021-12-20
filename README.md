@@ -7,10 +7,12 @@
 ![](https://img.shields.io/badge/language-kotlin-blue.svg)
 
 `wutsi-platform-payment` is a library that provide payment API for:
+
 - MTN
-- Orange Money (OM)
+- OM: Orange Money
 
 ## MTN Spring Configuration
+
 | Property | Default Value | Description |
 |----------|---------------|-------------|
 | wutsi.platform.payment.mtn.enabled | false | `true` to enable MTN payment provider |
@@ -24,6 +26,7 @@
 | wutsi.platform.payment.mtn.disbursement.api-key |  | Disbursement API Key. REQUIRED in production environment |
 
 ## Orange Spring Configuration
+
 | Property | Default Value | Description |
 |----------|---------------|-------------|
 | wutsi.platform.payment.om.enabled | false | `true` to enable Orange Money payment provider |
