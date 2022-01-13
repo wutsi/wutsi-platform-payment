@@ -95,12 +95,10 @@ open class OMGateway : Gateway {
     private fun getStatus(transactionId: String): Status {
         val value = UUID.fromString(transactionId).leastSignificantBits
         val bucket = abs(value) % 10
-        if (bucket < 4) {
+        if (bucket < 8) {
             return Status.SUCCESSFUL
-        } else if (bucket <= 7) {
-            return Status.PENDING
         } else {
-            return Status.FAILED
+            return Status.PENDING
         }
     }
 }
