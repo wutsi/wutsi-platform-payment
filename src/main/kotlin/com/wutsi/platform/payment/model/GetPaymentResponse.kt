@@ -10,5 +10,6 @@ data class GetPaymentResponse(
     val description: String = "",
     val payerMessage: String? = null,
     val externalId: String = "",
-    val financialTransactionId: String? = null
+    val financialTransactionId: String? = null,
+    val fees: Double = 0.0
 )

@@ -1,5 +1,5 @@
 package com.wutsi.platform.payment.provider.mtn.model
 
-data class ApiKeyResponse(
+data class MTNApiKeyResponse(
     val apiKey: String = ""
 )

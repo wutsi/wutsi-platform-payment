@@ -1,8 +1,8 @@
 package com.wutsi.platform.payment.provider.mtn.product
 
 import com.wutsi.platform.payment.core.Http
-import com.wutsi.platform.payment.provider.mtn.model.RequestToPayRequest
-import com.wutsi.platform.payment.provider.mtn.model.RequestToPayResponse
+import com.wutsi.platform.payment.provider.mtn.model.MTNRequestToPayRequest
+import com.wutsi.platform.payment.provider.mtn.model.MTNRequestToPayResponse
 
 open class Collection(
     config: ProductConfig,
@@ -11,7 +11,7 @@ open class Collection(
     fun requestToPay(
         referenceId: String,
         accessToken: String,
-        request: RequestToPayRequest
+        request: MTNRequestToPayRequest
     ) {
         http.post(
             referenceId = referenceId,
@@ -27,7 +27,7 @@ open class Collection(
             referenceId = referenceId,
             uri = uri("v1_0/requesttopay/$referenceId"),
             headers = headers(null, accessToken),
-            responseType = RequestToPayResponse::class.java
+            responseType = MTNRequestToPayResponse::class.java
         )!!
 
     override fun uri(path: String): String =

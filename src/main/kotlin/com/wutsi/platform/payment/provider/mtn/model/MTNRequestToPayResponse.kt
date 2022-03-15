@@ -1,6 +1,6 @@
 package com.wutsi.platform.payment.provider.mtn.model
 
-data class RequestToPayResponse(
+data class MTNRequestToPayResponse(
     val financialTransactionId: String? = null,
     val status: String = "",
     val reason: String? = null,
@@ -9,5 +9,5 @@ data class RequestToPayResponse(
     val externalId: String = "",
     val payeeNote: String = "",
     val payerMessage: String = "",
-    val payer: Party = Party()
+    val payer: MTNParty = MTNParty()
 )

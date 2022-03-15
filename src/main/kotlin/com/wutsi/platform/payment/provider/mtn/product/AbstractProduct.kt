@@ -1,7 +1,7 @@
 package com.wutsi.platform.payment.provider.mtn.product
 
 import com.wutsi.platform.payment.core.Http
-import com.wutsi.platform.payment.provider.mtn.model.TokenResponse
+import com.wutsi.platform.payment.provider.mtn.model.MTNTokenResponse
 import java.util.Base64
 
 abstract class AbstractProduct(
@@ -10,7 +10,7 @@ abstract class AbstractProduct(
 ) : Product {
     protected abstract fun uri(path: String): String
 
-    override fun token(referenceId: String): TokenResponse =
+    override fun token(referenceId: String): MTNTokenResponse =
         http.post(
             referenceId = referenceId,
             uri = uri("token"),
@@ -20,7 +20,7 @@ abstract class AbstractProduct(
                 "Ocp-Apim-Subscription-Key" to config.subscriptionKey
             ),
             requestPayload = mapOf("foo" to "bar"),
-            responseType = TokenResponse::class.java
+            responseType = MTNTokenResponse::class.java
         )!!
 
     protected fun headers(referenceId: String?, accessToken: String) = mutableMapOf<String, String?>(

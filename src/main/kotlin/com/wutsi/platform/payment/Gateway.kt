@@ -9,8 +9,6 @@ import com.wutsi.platform.payment.model.GetTransferResponse
 import java.io.IOException
 
 interface Gateway {
-    fun provider(): PaymentMethodProvider
-
     @Throws(PaymentException::class, IOException::class)
     fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse
 

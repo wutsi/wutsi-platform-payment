@@ -1,8 +1,8 @@
 package com.wutsi.platform.payment.provider.mtn.product
 
 import com.wutsi.platform.payment.core.Http
-import com.wutsi.platform.payment.provider.mtn.model.TransferRequest
-import com.wutsi.platform.payment.provider.mtn.model.TransferResponse
+import com.wutsi.platform.payment.provider.mtn.model.MTNTransferRequest
+import com.wutsi.platform.payment.provider.mtn.model.MTNTransferResponse
 
 open class Disbursement(
     config: ProductConfig,
@@ -11,7 +11,7 @@ open class Disbursement(
     fun transfer(
         referenceId: String,
         accessToken: String,
-        request: TransferRequest
+        request: MTNTransferRequest
     ) {
         http.post(
             referenceId = referenceId,
@@ -27,7 +27,7 @@ open class Disbursement(
             referenceId = referenceId,
             uri = uri("v1_0/transfer/$referenceId"),
             headers = headers(referenceId, accessToken),
-            responseType = TransferResponse::class.java
+            responseType = MTNTransferResponse::class.java
         )!!
 
     override fun uri(path: String): String =

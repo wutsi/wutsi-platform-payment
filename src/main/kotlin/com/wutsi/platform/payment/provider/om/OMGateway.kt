@@ -2,7 +2,6 @@ package com.wutsi.platform.payment.provider.om
 
 import com.wutsi.platform.payment.Gateway
 import com.wutsi.platform.payment.PaymentException
-import com.wutsi.platform.payment.PaymentMethodProvider.ORANGE
 import com.wutsi.platform.payment.core.Error
 import com.wutsi.platform.payment.core.ErrorCode
 import com.wutsi.platform.payment.core.Status
@@ -16,8 +15,6 @@ import java.util.UUID
 import kotlin.math.abs
 
 open class OMGateway : Gateway {
-    override fun provider() = ORANGE
-
     override fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {
         val transactionId = UUID.randomUUID().toString()
         val status = getStatus(transactionId)

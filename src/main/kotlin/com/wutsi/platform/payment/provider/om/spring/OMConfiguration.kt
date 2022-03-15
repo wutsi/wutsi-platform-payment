@@ -1,6 +1,7 @@
 package com.wutsi.platform.payment.provider.om.spring
 
 import com.wutsi.platform.payment.GatewayProvider
+import com.wutsi.platform.payment.PaymentMethodProvider
 import com.wutsi.platform.payment.provider.om.OMGateway
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
@@ -18,7 +19,7 @@ open class OMConfiguration(
     @Bean
     open fun omGateway(): OMGateway {
         val gateway = OMGateway()
-        gatewayProvider.register(gateway)
+        gatewayProvider.register(PaymentMethodProvider.ORANGE, gateway)
         return gateway
     }
 }

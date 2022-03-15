@@ -8,25 +8,37 @@
 
 `wutsi-platform-payment` is a library that provide payment API for:
 
+- Flutterwave
 - MTN
 - OM: Orange Money
 
+## Flutterwave Spring Configuration
+
+Implementation of the payment gateway based on [Flutterwawe](https://www.flutterwave.com)
+
+| Property                                      | Default Value | Description                                  |
+|-----------------------------------------------|---------------|----------------------------------------------|
+| wutsi.platform.payment.flutterwave.enabled    | false         | `true` to enable Flutterwave payment gateway |
+| wutsi.platform.payment.flutterwave.secret-key |               | Flutterwave secret key                       |
+
 ## MTN Spring Configuration
 
-| Property | Default Value | Description |
-|----------|---------------|-------------|
-| wutsi.platform.payment.mtn.enabled | false | `true` to enable MTN payment provider |
-| wutsi.platform.payment.mtn.environment |  | REQUIRED. `sandbox` or `production` |
-| wutsi.platform.payment.mtn.callback-url |  | REQUIRED. Callback URL |
-| wutsi.platform.payment.mtn.collection.subscription-key |  | REQUIRED. Subscription Key of the Collection API |
-| wutsi.platform.payment.mtn.collection.user-id |  | Collection User ID. REQUIRED in production environment |
-| wutsi.platform.payment.mtn.collection.api-key |  | Collection API Key. REDIURED in production environment |
-| wutsi.platform.payment.mtn.disbursement.subscription-key |  | REQUIRED. Subscription Key of the Disbursement API |
-| wutsi.platform.payment.mtn.disbursement.user-id |  | Disbursement User ID. REQUIRED in production environment |
-| wutsi.platform.payment.mtn.disbursement.api-key |  | Disbursement API Key. REQUIRED in production environment |
+| Property                                                 | Default Value | Description                                              |
+|----------------------------------------------------------|---------------|----------------------------------------------------------|
+| wutsi.platform.payment.mtn.enabled                       | false         | `true` to enable MTN payment gateway                     |
+| wutsi.platform.payment.mtn.environment                   |               | REQUIRED. `sandbox` or `production`                      |
+| wutsi.platform.payment.mtn.callback-url                  |               | REQUIRED. Callback URL                                   |
+| wutsi.platform.payment.mtn.collection.subscription-key   |               | REQUIRED. Subscription Key of the Collection API         |
+| wutsi.platform.payment.mtn.collection.user-id            |               | Collection User ID. REQUIRED in production environment   |
+| wutsi.platform.payment.mtn.collection.api-key            |               | Collection API Key. REDIURED in production environment   |
+| wutsi.platform.payment.mtn.disbursement.subscription-key |               | REQUIRED. Subscription Key of the Disbursement API       |
+| wutsi.platform.payment.mtn.disbursement.user-id          |               | Disbursement User ID. REQUIRED in production environment |
+| wutsi.platform.payment.mtn.disbursement.api-key          |               | Disbursement API Key. REQUIRED in production environment |
 
 ## Orange Spring Configuration
 
-| Property | Default Value | Description |
-|----------|---------------|-------------|
-| wutsi.platform.payment.om.enabled | false | `true` to enable Orange Money payment provider |
+NOTE: This is not PROD Ready!!!!
+
+| Property                            | Default Value | Description                                   |
+|-------------------------------------|---------------|-----------------------------------------------|
+| wutsi.platform.payment.om.enabled   | false         | `true` to enable Orange Money payment gateway |

@@ -2,7 +2,6 @@ package com.wutsi.platform.payment.provider.mtn
 
 import com.wutsi.platform.payment.Gateway
 import com.wutsi.platform.payment.PaymentException
-import com.wutsi.platform.payment.PaymentMethodProvider.MTN
 import com.wutsi.platform.payment.core.Error
 import com.wutsi.platform.payment.core.ErrorCode
 import com.wutsi.platform.payment.core.ErrorCode.AUTHENTICATION_FAILED
@@ -19,9 +18,9 @@ import com.wutsi.platform.payment.model.CreateTransferResponse
 import com.wutsi.platform.payment.model.GetPaymentResponse
 import com.wutsi.platform.payment.model.GetTransferResponse
 import com.wutsi.platform.payment.provider.mtn.Environment.SANDBOX
-import com.wutsi.platform.payment.provider.mtn.model.Party
-import com.wutsi.platform.payment.provider.mtn.model.RequestToPayRequest
-import com.wutsi.platform.payment.provider.mtn.model.TransferRequest
+import com.wutsi.platform.payment.provider.mtn.model.MTNParty
+import com.wutsi.platform.payment.provider.mtn.model.MTNRequestToPayRequest
+import com.wutsi.platform.payment.provider.mtn.model.MTNTransferRequest
 import com.wutsi.platform.payment.provider.mtn.product.Collection
 import com.wutsi.platform.payment.provider.mtn.product.Disbursement
 import com.wutsi.platform.payment.provider.mtn.product.ProductConfig
@@ -36,8 +35,6 @@ open class MTNGateway(
         private val LOGGER = LoggerFactory.getLogger(MTNGateway::class.java)
     }
 
-    override fun provider() = MTN
-
     override fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {
         LOGGER.info("Creating payment")
 
@@ -47,10 +44,10 @@ open class MTNGateway(
             collection.requestToPay(
                 referenceId = transactionId,
                 accessToken = accessToken,
-                request = RequestToPayRequest(
+                request = MTNRequestToPayRequest(
                     amount = request.amount.value.toString(),
                     currency = currency(collection.config, request.amount.currency),
-                    payer = Party(toPhoneNumber(request.payer.phoneNumber)),
+                    payer = MTNParty(toPhoneNumber(request.payer.phoneNumber)),
                     payeeNote = request.description,
                     externalId = request.externalId,
                     payerMessage = request.payerMessage ?: ""
@@ -119,10 +116,10 @@ open class MTNGateway(
             disbursement.transfer(
                 referenceId = transactionId,
                 accessToken = accessToken,
-                request = TransferRequest(
+                request = MTNTransferRequest(
                     amount = request.amount.value.toString(),
                     currency = currency(disbursement.config, request.amount.currency),
-                    payee = Party(toPhoneNumber(request.payee.phoneNumber)),
+                    payee = MTNParty(toPhoneNumber(request.payee.phoneNumber)),
                     payeeNote = request.description,
                     externalId = request.externalId,
                     payerMessage = request.payerMessage ?: ""

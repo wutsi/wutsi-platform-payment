@@ -8,12 +8,12 @@ import java.net.http.HttpRequest.BodyPublishers
 import java.net.http.HttpRequest.Builder
 import java.net.http.HttpResponse
 
-class Http(
+open class Http(
     private val client: HttpClient,
     private val objectMapper: ObjectMapper,
     private val listener: HttpListener = DefaultHttpListener()
 ) {
-    fun <T> get(
+    open fun <T> get(
         referenceId: String,
         uri: String,
         responseType: Class<T>,
@@ -28,7 +28,7 @@ class Http(
         return handle(referenceId, responseType, request, null)
     }
 
-    fun <T> post(
+    open fun <T> post(
         referenceId: String,
         uri: String,
         requestPayload: Any,
@@ -45,7 +45,12 @@ class Http(
         return handle(referenceId, responseType, request, requestBody)
     }
 
-    private fun <T> handle(referenceId: String, responseType: Class<T>, request: HttpRequest, requestBody: String?): T? {
+    private fun <T> handle(
+        referenceId: String,
+        responseType: Class<T>,
+        request: HttpRequest,
+        requestBody: String?
+    ): T? {
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
         try {
             if (response.statusCode() / 100 == 2)

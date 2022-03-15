@@ -9,10 +9,10 @@ open class GatewayProvider {
 
     private val gateways: MutableMap<PaymentMethodProvider, Gateway> = mutableMapOf()
 
-    fun register(gateway: Gateway) {
-        LOGGER.info("Registering Gateway: ${gateway.provider()}")
+    fun register(provider: PaymentMethodProvider, gateway: Gateway) {
+        LOGGER.info("Registering Gateway: $provider")
 
-        gateways[gateway.provider()] = gateway
+        gateways[provider] = gateway
     }
 
     fun get(provider: PaymentMethodProvider) =

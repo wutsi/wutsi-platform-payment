@@ -2,6 +2,7 @@ package com.wutsi.platform.payment.provider.mtn.spring
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wutsi.platform.payment.GatewayProvider
+import com.wutsi.platform.payment.PaymentMethodProvider
 import com.wutsi.platform.payment.core.DefaultHttpListener
 import com.wutsi.platform.payment.core.Http
 import com.wutsi.platform.payment.provider.mtn.Environment
@@ -56,7 +57,7 @@ open class MTNConfiguration(
             collection = mtnCollection(),
             disbursement = mtnDisbursement()
         )
-        gatewayProvider.register(gateway)
+        gatewayProvider.register(PaymentMethodProvider.MTN, gateway)
         return gateway
     }
 

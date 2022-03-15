@@ -5,7 +5,7 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import com.wutsi.platform.payment.provider.mtn.model.TokenResponse
+import com.wutsi.platform.payment.provider.mtn.model.MTNTokenResponse
 import com.wutsi.platform.payment.provider.mtn.product.Product
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +25,7 @@ internal class MTNProductHealthIndicatorTest {
 
     @Test
     fun up() {
-        doReturn(TokenResponse("")).whenever(product).token(any())
+        doReturn(MTNTokenResponse("")).whenever(product).token(any())
         val result = hc.health()
 
         assertEquals(Status.UP, result.status)

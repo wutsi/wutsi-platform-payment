@@ -4,7 +4,7 @@ import com.wutsi.platform.payment.core.Http
 import com.wutsi.platform.payment.provider.mtn.Environment.SANDBOX
 import com.wutsi.platform.payment.provider.mtn.User
 import com.wutsi.platform.payment.provider.mtn.UserProvider
-import com.wutsi.platform.payment.provider.mtn.model.ApiKeyResponse
+import com.wutsi.platform.payment.provider.mtn.model.MTNApiKeyResponse
 import org.slf4j.LoggerFactory
 import java.net.URL
 import java.util.UUID
@@ -57,7 +57,7 @@ class UserProviderSandbox(
                     "Ocp-Apim-Subscription-Key" to subscriptionKey
                 ),
                 requestPayload = emptyMap<String, String>(),
-                responseType = ApiKeyResponse::class.java
+                responseType = MTNApiKeyResponse::class.java
             )!!.apiKey
             LOGGER.info("User#$userId - apiKey=$apiKey")
 

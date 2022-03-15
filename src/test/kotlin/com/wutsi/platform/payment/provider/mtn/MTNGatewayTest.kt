@@ -2,7 +2,6 @@ package com.wutsi.platform.payment.provider.mtn
 
 import com.wutsi.platform.payment.Gateway
 import com.wutsi.platform.payment.PaymentException
-import com.wutsi.platform.payment.PaymentMethodProvider
 import com.wutsi.platform.payment.core.ErrorCode
 import com.wutsi.platform.payment.core.Money
 import com.wutsi.platform.payment.core.Status
@@ -25,11 +24,6 @@ internal class MTNGatewayTest {
     @BeforeEach
     fun setUp() {
         Thread.sleep(5000) // Sleep to prevent 429 error
-    }
-
-    @Test
-    fun provider() {
-        assertEquals(PaymentMethodProvider.MTN, gateway.provider())
     }
 
     @Test
