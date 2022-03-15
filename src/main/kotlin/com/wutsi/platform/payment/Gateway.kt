@@ -4,6 +4,8 @@ import com.wutsi.platform.payment.model.CreatePaymentRequest
 import com.wutsi.platform.payment.model.CreatePaymentResponse
 import com.wutsi.platform.payment.model.CreateTransferRequest
 import com.wutsi.platform.payment.model.CreateTransferResponse
+import com.wutsi.platform.payment.model.GetFeesRequest
+import com.wutsi.platform.payment.model.GetFeesResponse
 import com.wutsi.platform.payment.model.GetPaymentResponse
 import com.wutsi.platform.payment.model.GetTransferResponse
 import java.io.IOException
@@ -20,4 +22,7 @@ interface Gateway {
 
     @Throws(PaymentException::class, IOException::class)
     fun getTransfer(transactionId: String): GetTransferResponse
+
+    @Throws(PaymentException::class, IOException::class)
+    fun getFees(request: GetFeesRequest): GetFeesResponse
 }

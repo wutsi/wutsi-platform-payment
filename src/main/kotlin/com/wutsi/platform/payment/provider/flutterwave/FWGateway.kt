@@ -3,6 +3,7 @@ package com.wutsi.platform.payment.provider.flutterwave
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wutsi.platform.payment.Gateway
 import com.wutsi.platform.payment.PaymentException
+import com.wutsi.platform.payment.PaymentMethodType
 import com.wutsi.platform.payment.core.Error
 import com.wutsi.platform.payment.core.ErrorCode
 import com.wutsi.platform.payment.core.Http
@@ -13,12 +14,16 @@ import com.wutsi.platform.payment.model.CreatePaymentRequest
 import com.wutsi.platform.payment.model.CreatePaymentResponse
 import com.wutsi.platform.payment.model.CreateTransferRequest
 import com.wutsi.platform.payment.model.CreateTransferResponse
+import com.wutsi.platform.payment.model.GetFeesRequest
+import com.wutsi.platform.payment.model.GetFeesResponse
 import com.wutsi.platform.payment.model.GetPaymentResponse
 import com.wutsi.platform.payment.model.GetTransferResponse
 import com.wutsi.platform.payment.model.Party
 import com.wutsi.platform.payment.provider.flutterwave.model.FWChargeRequest
+import com.wutsi.platform.payment.provider.flutterwave.model.FWFeeRequest
 import com.wutsi.platform.payment.provider.flutterwave.model.FWResponse
 import com.wutsi.platform.payment.provider.flutterwave.model.FWTransferRequest
+import java.util.UUID
 
 open class FWGateway(
     private val http: Http,
@@ -154,6 +159,41 @@ open class FWGateway(
                 fees = data?.fee ?: 0.0
             )
         }
+    }
+
+    override fun getFees(request: GetFeesRequest): GetFeesResponse {
+        try {
+            val response = http.post(
+                referenceId = UUID.randomUUID().toString(),
+                uri = "$BASE_URI/transactions/fee",
+                requestPayload = FWFeeRequest(
+                    amount = request.amount.value,
+                    currency = request.amount.currency,
+                    type = toFeeType(request)
+                ),
+                responseType = FWResponse::class.java,
+                headers = toHeaders()
+            )
+
+            val data = response?.data
+            return GetFeesResponse(
+                amount = Money(
+                    value = data?.amount ?: 0.0,
+                    currency = data?.currency ?: ""
+                ),
+                fees = Money(
+                    value = data?.fee ?: 0.0,
+                    currency = data?.currency ?: ""
+                )
+            )
+        } catch (ex: HttpException) {
+            throw handleException(ex)
+        }
+    }
+
+    private fun toFeeType(request: GetFeesRequest): String = when (request.paymentMethodType) {
+        PaymentMethodType.MOBILE -> "mobilemoney"
+        else -> throw IllegalStateException("Unsupported payment method type: ${request.paymentMethodType}")
     }
 
     private fun toSupplyErrorCode(response: FWResponse): String? =
