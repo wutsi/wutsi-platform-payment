@@ -15,8 +15,6 @@ import com.wutsi.platform.payment.model.CreatePaymentRequest
 import com.wutsi.platform.payment.model.CreatePaymentResponse
 import com.wutsi.platform.payment.model.CreateTransferRequest
 import com.wutsi.platform.payment.model.CreateTransferResponse
-import com.wutsi.platform.payment.model.GetFeesRequest
-import com.wutsi.platform.payment.model.GetFeesResponse
 import com.wutsi.platform.payment.model.GetPaymentResponse
 import com.wutsi.platform.payment.model.GetTransferResponse
 import com.wutsi.platform.payment.provider.mtn.Environment.SANDBOX
@@ -177,8 +175,6 @@ open class MTNGateway(
                 )
             )
     }
-
-    override fun getFees(request: GetFeesRequest) = GetFeesResponse()
 
     private fun currency(config: ProductConfig, currency: String): String =
         if (config.environment == SANDBOX)

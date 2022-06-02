@@ -9,8 +9,6 @@ import com.wutsi.platform.payment.model.CreatePaymentRequest
 import com.wutsi.platform.payment.model.CreatePaymentResponse
 import com.wutsi.platform.payment.model.CreateTransferRequest
 import com.wutsi.platform.payment.model.CreateTransferResponse
-import com.wutsi.platform.payment.model.GetFeesRequest
-import com.wutsi.platform.payment.model.GetFeesResponse
 import com.wutsi.platform.payment.model.GetPaymentResponse
 import com.wutsi.platform.payment.model.GetTransferResponse
 import java.util.UUID
@@ -90,8 +88,6 @@ open class OMGateway : Gateway {
             financialTransactionId = UUID.randomUUID().toString()
         )
     }
-
-    override fun getFees(request: GetFeesRequest) = GetFeesResponse()
 
     private fun getStatus(transactionId: String): Status {
         val value = UUID.fromString(transactionId).leastSignificantBits

@@ -11,7 +11,6 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.wutsi.platform.payment.Gateway
 import com.wutsi.platform.payment.PaymentException
-import com.wutsi.platform.payment.PaymentMethodType
 import com.wutsi.platform.payment.core.ErrorCode
 import com.wutsi.platform.payment.core.Http
 import com.wutsi.platform.payment.core.HttpException
@@ -19,7 +18,6 @@ import com.wutsi.platform.payment.core.Money
 import com.wutsi.platform.payment.core.Status
 import com.wutsi.platform.payment.model.CreatePaymentRequest
 import com.wutsi.platform.payment.model.CreateTransferRequest
-import com.wutsi.platform.payment.model.GetFeesRequest
 import com.wutsi.platform.payment.model.Party
 import com.wutsi.platform.payment.provider.flutterwave.model.FWResponse
 import com.wutsi.platform.payment.provider.flutterwave.model.FWResponseData
@@ -63,7 +61,7 @@ internal class FWGatewayTest {
         assertEquals(Status.SUCCESSFUL, response.status)
         assertEquals(id.toString(), response.transactionId)
         assertNull(response.financialTransactionId)
-        assertEquals(resp.data?.fee, response.fees)
+        assertEquals(resp.data?.fee, response.fees.value)
 
         val headers = argumentCaptor<Map<String, String>>()
         verify(http).post(
@@ -152,13 +150,13 @@ internal class FWGatewayTest {
         val response = gateway.getTransfer(id.toString())
 
         // THEN
-        assertEquals("", response.externalId)
+        assertEquals(resp.data!!.reference, response.externalId)
         assertEquals(resp.data!!.narration, response.description)
         assertEquals(resp.data!!.amount, response.amount.value)
         assertEquals(resp.data!!.currency, response.amount.currency)
         assertEquals(resp.data!!.full_name, response.payee.fullName)
         assertEquals(resp.data!!.account_number, response.payee.phoneNumber)
-        assertEquals(resp.data!!.fee, response.fees)
+        assertEquals(resp.data!!.fee, response.fees.value)
         assertEquals(Status.SUCCESSFUL, response.status)
         assertNull(response.payerMessage)
 
@@ -207,7 +205,7 @@ internal class FWGatewayTest {
                 id = id,
                 status = "SUCCESSFUL",
                 flw_ref = "323232323",
-                app_fee = 100.0
+                fee = 100.0
             )
         )
         doReturn(resp).whenever(http).post(any(), any(), any(), eq(FWResponse::class.java), any())
@@ -220,7 +218,7 @@ internal class FWGatewayTest {
         assertEquals(Status.SUCCESSFUL, response.status)
         assertEquals(id.toString(), response.transactionId)
         assertEquals(resp.data?.flw_ref, response.financialTransactionId)
-        assertEquals(resp.data?.app_fee, response.fees)
+        assertEquals(resp.data?.fee, response.fees.value)
 
         val headers = argumentCaptor<Map<String, String>>()
         verify(http).post(
@@ -329,7 +327,7 @@ internal class FWGatewayTest {
         assertEquals(resp.data!!.currency, response.amount.currency)
         assertEquals(resp.data!!.full_name, response.payer.fullName)
         assertEquals(resp.data!!.account_number, response.payer.phoneNumber)
-        assertEquals(resp.data!!.app_fee, response.fees)
+        assertEquals(resp.data!!.fee, response.fees.value)
         assertEquals(Status.SUCCESSFUL, response.status)
         assertNull(response.payerMessage)
 
@@ -368,42 +366,6 @@ internal class FWGatewayTest {
         assertEquals(resp.code, ex.error.supplierErrorCode)
     }
 
-    @Test
-    fun `get-fees - successful`() {
-        // GIVEN
-        val id = System.currentTimeMillis()
-        val resp = FWResponse(
-            status = "success",
-            data = FWResponseData(
-                id = id,
-                currency = "XAF",
-                fee = 10.0,
-                amount = 1000.0
-            )
-        )
-        doReturn(resp).whenever(http).post(any(), any(), any(), eq(FWResponse::class.java), any())
-
-        // WHEN
-        val req = createFeeRequest()
-        val response = gateway.getFees(req)
-
-        // THEN
-        assertEquals(resp.data!!.amount, response.amount.value)
-        assertEquals(resp.data!!.currency, response.amount.currency)
-        assertEquals(resp.data!!.fee, response.fees.value)
-        assertEquals(resp.data!!.currency, response.fees.currency)
-
-        val headers = argumentCaptor<Map<String, String>>()
-        verify(http).post(
-            any(),
-            eq("${FWGateway.BASE_URI}/transactions/fee"),
-            any(),
-            eq(FWResponse::class.java),
-            headers.capture()
-        )
-        assertEquals("Bearer $secretKey", headers.firstValue["Authorization"])
-    }
-
     private fun createTransferRequest(phoneNumber: String) = CreateTransferRequest(
         payee = Party(
             fullName = "Ray Sponsible",
@@ -431,13 +393,5 @@ internal class FWGatewayTest {
         payerMessage = "Hello wold",
         externalId = UUID.randomUUID().toString(),
         description = "Sample product"
-    )
-
-    private fun createFeeRequest() = GetFeesRequest(
-        amount = Money(
-            value = 1000.0,
-            currency = "XAF"
-        ),
-        paymentMethodType = PaymentMethodType.MOBILE
     )
 }

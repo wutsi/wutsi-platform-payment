@@ -12,5 +12,5 @@ data class GetTransferResponse(
     val payerMessage: String? = null,
     val status: Status = UNKNOWN,
     val financialTransactionId: String? = null,
-    val fees: Double = 0.0
+    val fees: Money = Money()
 )

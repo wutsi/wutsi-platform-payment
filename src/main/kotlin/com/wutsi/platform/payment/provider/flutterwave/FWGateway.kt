@@ -3,7 +3,6 @@ package com.wutsi.platform.payment.provider.flutterwave
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wutsi.platform.payment.Gateway
 import com.wutsi.platform.payment.PaymentException
-import com.wutsi.platform.payment.PaymentMethodType
 import com.wutsi.platform.payment.core.Error
 import com.wutsi.platform.payment.core.ErrorCode
 import com.wutsi.platform.payment.core.Http
@@ -14,16 +13,12 @@ import com.wutsi.platform.payment.model.CreatePaymentRequest
 import com.wutsi.platform.payment.model.CreatePaymentResponse
 import com.wutsi.platform.payment.model.CreateTransferRequest
 import com.wutsi.platform.payment.model.CreateTransferResponse
-import com.wutsi.platform.payment.model.GetFeesRequest
-import com.wutsi.platform.payment.model.GetFeesResponse
 import com.wutsi.platform.payment.model.GetPaymentResponse
 import com.wutsi.platform.payment.model.GetTransferResponse
 import com.wutsi.platform.payment.model.Party
 import com.wutsi.platform.payment.provider.flutterwave.model.FWChargeRequest
-import com.wutsi.platform.payment.provider.flutterwave.model.FWFeeRequest
 import com.wutsi.platform.payment.provider.flutterwave.model.FWResponse
 import com.wutsi.platform.payment.provider.flutterwave.model.FWTransferRequest
-import java.util.UUID
 
 open class FWGateway(
     private val http: Http,
@@ -39,11 +34,12 @@ open class FWGateway(
                 referenceId = request.externalId,
                 uri = "$BASE_URI/charges?type=" + toChargeType(request),
                 requestPayload = FWChargeRequest(
-                    amount = request.amount.value,
+                    amount = toAmount(request.amount),
                     currency = request.amount.currency,
-                    email = request.payer.email,
+                    email = request.payer.email ?: "",
                     tx_ref = request.externalId,
-                    phone_number = request.payer.phoneNumber,
+                    phone_number = toPhoneNumber(request.payer.phoneNumber),
+                    country = request.payer.country,
                     fullname = request.payer.fullName
                 ),
                 responseType = FWResponse::class.java,
@@ -59,7 +55,7 @@ open class FWGateway(
                     transactionId = id?.toString() ?: "",
                     financialTransactionId = response.data?.flw_ref,
                     status = toStatus(response),
-                    fees = response.data?.app_fee ?: 0.0
+                    fees = Money(response.data?.fee ?: 0.0, request.amount.currency)
                 )
             }
         } catch (ex: HttpException) {
@@ -91,7 +87,7 @@ open class FWGateway(
                     fullName = data?.full_name ?: "",
                     phoneNumber = data?.account_number ?: ""
                 ),
-                fees = data?.app_fee ?: 0.0,
+                fees = Money(data?.fee ?: 0.0, data?.currency ?: ""),
                 externalId = data?.tx_ref ?: "",
                 financialTransactionId = data?.flw_ref
             )
@@ -100,18 +96,20 @@ open class FWGateway(
 
     override fun createTransfer(request: CreateTransferRequest): CreateTransferResponse {
         try {
+            val payload = FWTransferRequest(
+                amount = toAmount(request.amount),
+                currency = request.amount.currency,
+                account_number = toPhoneNumber(request.payee.phoneNumber),
+                beneficiary_name = request.payee.fullName,
+                account_bank = toAccountBank(request.amount.currency),
+                narration = request.description,
+                reference = request.externalId,
+                email = request.payee.email ?: "",
+            )
             val response = http.post(
                 referenceId = request.externalId,
                 uri = "$BASE_URI/transfers",
-                requestPayload = FWTransferRequest(
-                    amount = request.amount.value,
-                    currency = request.amount.currency,
-                    account_number = toPhoneNumber(request.payee.phoneNumber),
-                    beneficiary_name = request.payee.fullName,
-                    account_bank = toAccountBank(request.amount.currency),
-                    narration = request.description,
-                    reference = request.externalId
-                ),
+                requestPayload = payload,
                 responseType = FWResponse::class.java,
                 headers = toHeaders()
             )!!
@@ -124,7 +122,7 @@ open class FWGateway(
                     transactionId = response.data?.id?.toString() ?: "",
                     financialTransactionId = null,
                     status = toStatus(response),
-                    fees = response.data?.fee ?: 0.0
+                    fees = Money(response.data?.fee ?: 0.0, response.data?.currency ?: ""),
                 )
             }
         } catch (ex: HttpException) {
@@ -156,50 +154,18 @@ open class FWGateway(
                     fullName = data?.full_name ?: "",
                     phoneNumber = data?.account_number ?: ""
                 ),
-                fees = data?.fee ?: 0.0
+                fees = Money(data?.fee ?: 0.0, data?.currency ?: ""),
+                externalId = data?.reference ?: ""
             )
         }
-    }
-
-    override fun getFees(request: GetFeesRequest): GetFeesResponse {
-        try {
-            val response = http.post(
-                referenceId = UUID.randomUUID().toString(),
-                uri = "$BASE_URI/transactions/fee",
-                requestPayload = FWFeeRequest(
-                    amount = request.amount.value,
-                    currency = request.amount.currency,
-                    type = toFeeType(request)
-                ),
-                responseType = FWResponse::class.java,
-                headers = toHeaders()
-            )
-
-            val data = response?.data
-            return GetFeesResponse(
-                amount = Money(
-                    value = data?.amount ?: 0.0,
-                    currency = data?.currency ?: ""
-                ),
-                fees = Money(
-                    value = data?.fee ?: 0.0,
-                    currency = data?.currency ?: ""
-                )
-            )
-        } catch (ex: HttpException) {
-            throw handleException(ex)
-        }
-    }
-
-    private fun toFeeType(request: GetFeesRequest): String = when (request.paymentMethodType) {
-        PaymentMethodType.MOBILE -> "mobilemoney"
-        else -> throw IllegalStateException("Unsupported payment method type: ${request.paymentMethodType}")
     }
 
     private fun toSupplyErrorCode(response: FWResponse): String? =
         response.code
 
-    /** See https://developer.flutterwave.com/docs/integration-guides/errors/ */
+    /**
+     * See https://developer.flutterwave.com/docs/integration-guides/errors/
+     */
     private fun toErrorCode(response: FWResponse): ErrorCode = when (response.message) {
         "DECLINED" -> ErrorCode.DECLINED
         "INSUFFICIENT_FUNDS" -> ErrorCode.NOT_ENOUGH_FUNDS
@@ -212,8 +178,12 @@ open class FWGateway(
     }
 
     private fun toHeaders() = mapOf(
-        "Authorization" to "Bearer $secretKey"
+        "Authorization" to "Bearer $secretKey",
+        "Content-Type" to "application/json"
     )
+
+    private fun toAmount(money: Money): String =
+        money.value.toInt().toString()
 
     private fun toPhoneNumber(number: String): String =
         if (number.startsWith("+"))

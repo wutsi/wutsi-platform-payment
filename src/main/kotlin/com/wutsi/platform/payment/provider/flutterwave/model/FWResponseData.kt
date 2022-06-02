@@ -10,10 +10,9 @@ data class FWResponseData(
     val amount: Double = 0.0,
     val fee: Double = 0.0,
     val status: String = "",
-    val reference: String = "",
-    val meta: FWMetadata? = null,
-    val narration: String? = "",
-    val complete_message: String = "",
+    val reference: String? = null,
+    val narration: String? = null,
+    val complete_message: String? = null,
     val requires_approval: Int = 0,
     val is_approved: Int = 0,
     val bank_name: String? = null,
@@ -23,5 +22,5 @@ data class FWResponseData(
     val merchant_fee: Double = 0.0,
     val fraud_status: String? = null,
     val charge_type: String? = null,
-    val processor_response: String? = null
+    val processor_response: String? = null,
 )
