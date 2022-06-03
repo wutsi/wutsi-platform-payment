@@ -38,7 +38,7 @@ internal class FWGatewayIntegrationTest {
     @Ignore
     fun `MobileMoney - CM - payment - success`() {
         // WHEN
-        val request = createPaymentRequest("+237699432881")
+        val request = createPaymentRequest("+23700000020")
         val response = gateway.createPayment(request)
 
         // THEN
@@ -72,7 +72,7 @@ internal class FWGatewayIntegrationTest {
         payee = Party(
             fullName = "Ray Sponsible",
             phoneNumber = phoneNumber,
-            email = "ray.sponsible@gmail.com"
+            email = ""
         ),
         amount = Money(
             value = 25000.0,
