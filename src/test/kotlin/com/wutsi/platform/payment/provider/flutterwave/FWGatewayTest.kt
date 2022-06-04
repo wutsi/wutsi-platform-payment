@@ -19,6 +19,7 @@ import com.wutsi.platform.payment.core.Status
 import com.wutsi.platform.payment.model.CreatePaymentRequest
 import com.wutsi.platform.payment.model.CreateTransferRequest
 import com.wutsi.platform.payment.model.Party
+import com.wutsi.platform.payment.provider.flutterwave.model.FWCustomer
 import com.wutsi.platform.payment.provider.flutterwave.model.FWResponse
 import com.wutsi.platform.payment.provider.flutterwave.model.FWResponseData
 import org.junit.jupiter.api.BeforeEach
@@ -307,13 +308,17 @@ internal class FWGatewayTest {
                 status = "SUCCESSFUL",
                 tx_ref = "tx-0000",
                 flw_ref = "flw-00000",
-                full_name = "Ray Sponsible",
-                account_number = "237670000001",
                 amount = 3000.0,
                 currency = "XAF",
                 fee = 5.0,
                 app_fee = 55.0,
-                narration = "Sample transfer",
+                narration = "Sample payment",
+                customer = FWCustomer(
+                    id = 11111,
+                    name = "Ray Sponsible",
+                    email = "ray.sponsible@gmail.com",
+                    phone_number = "237670000001"
+                )
             )
         )
         doReturn(resp).whenever(http).get(any(), any(), eq(FWResponse::class.java), any())
@@ -322,14 +327,15 @@ internal class FWGatewayTest {
         val response = gateway.getPayment(id.toString())
 
         // THEN
-        assertEquals(resp.data!!.tx_ref, response.externalId)
-        assertEquals(resp.data!!.flw_ref, response.financialTransactionId)
-        assertEquals(resp.data!!.narration, response.description)
-        assertEquals(resp.data!!.amount, response.amount.value)
-        assertEquals(resp.data!!.currency, response.amount.currency)
-        assertEquals(resp.data!!.full_name, response.payer.fullName)
-        assertEquals(resp.data!!.account_number, response.payer.phoneNumber)
-        assertEquals(resp.data!!.app_fee, response.fees.value)
+        assertEquals(resp.data?.tx_ref, response.externalId)
+        assertEquals(resp.data?.flw_ref, response.financialTransactionId)
+        assertEquals(resp.data?.narration, response.description)
+        assertEquals(resp.data?.amount, response.amount.value)
+        assertEquals(resp.data?.currency, response.amount.currency)
+        assertEquals(resp.data?.customer?.name, response.payer.fullName)
+        assertEquals(resp.data?.customer?.phone_number, response.payer.phoneNumber)
+        assertEquals(resp.data?.customer?.email, response.payer.email)
+        assertEquals(resp.data?.app_fee, response.fees.value)
         assertEquals(Status.SUCCESSFUL, response.status)
         assertNull(response.payerMessage)
 

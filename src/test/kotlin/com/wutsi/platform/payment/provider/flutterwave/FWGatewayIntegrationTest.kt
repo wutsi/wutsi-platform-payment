@@ -34,7 +34,6 @@ internal class FWGatewayIntegrationTest {
     }
 
     @Test
-    //@Ignore
     fun `MobileMoney - CM - payment - success`() {
         // WHEN
         val request = createPaymentRequest("+23700000020")
