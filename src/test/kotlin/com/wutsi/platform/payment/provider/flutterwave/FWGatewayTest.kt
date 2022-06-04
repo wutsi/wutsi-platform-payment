@@ -329,14 +329,14 @@ internal class FWGatewayTest {
         assertEquals(resp.data!!.currency, response.amount.currency)
         assertEquals(resp.data!!.full_name, response.payer.fullName)
         assertEquals(resp.data!!.account_number, response.payer.phoneNumber)
-        assertEquals(resp.data!!.fee, response.fees.value)
+        assertEquals(resp.data!!.app_fee, response.fees.value)
         assertEquals(Status.SUCCESSFUL, response.status)
         assertNull(response.payerMessage)
 
         val headers = argumentCaptor<Map<String, String>>()
         verify(http).get(
             any(),
-            eq("${FWGateway.BASE_URI}/charges/$id"),
+            eq("${FWGateway.BASE_URI}/transactions/$id/verify"),
             eq(FWResponse::class.java),
             headers.capture()
         )

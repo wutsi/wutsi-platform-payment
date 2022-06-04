@@ -43,6 +43,17 @@ internal class FWGatewayIntegrationTest {
         assertEquals(375.0, response.fees.value)
         assertNotNull(response.transactionId)
         assertNotNull(response.financialTransactionId)
+
+        println("Fetching details...")
+        val response2 = gateway.getPayment(response.transactionId)
+        assertEquals(request.amount, response2.amount)
+        assertEquals(response.fees, response2.fees)
+        assertEquals(response.status, response2.status)
+        assertEquals(request.externalId, response2.externalId)
+        assertEquals(request.payer.email, response2.payer.email)
+        assertEquals(request.payer.fullName, response2.payer.fullName)
+        assertEquals(request.payer.phoneNumber.substring(1), response2.payer.phoneNumber)
+        assertNull(response2.payer.country)
     }
 
     @Test

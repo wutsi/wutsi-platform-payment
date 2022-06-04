@@ -23,4 +23,5 @@ data class FWResponseData(
     val fraud_status: String? = null,
     val charge_type: String? = null,
     val processor_response: String? = null,
+    val customer: FWCustomer? = null,
 )
