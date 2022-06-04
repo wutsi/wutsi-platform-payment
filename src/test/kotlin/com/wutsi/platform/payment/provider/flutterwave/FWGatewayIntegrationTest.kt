@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.http.HttpClient
 import java.util.UUID
-import kotlin.test.Ignore
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -35,20 +34,21 @@ internal class FWGatewayIntegrationTest {
     }
 
     @Test
-    @Ignore
+    //@Ignore
     fun `MobileMoney - CM - payment - success`() {
         // WHEN
         val request = createPaymentRequest("+23700000020")
         val response = gateway.createPayment(request)
-
-        // THEN
-        assertEquals(Status.SUCCESSFUL, response.status)
+        assertEquals(Status.PENDING, response.status)
+        assertEquals(375.0, response.fees.value)
+        assertNotNull(response.transactionId)
+        assertNotNull(response.financialTransactionId)
     }
 
     @Test
     fun `MobileMoney - CM - transfer`() {
         // TRANSFER
-        println("Transfering...")
+        println("Transfer...")
         val request = createTransferRequest("+23700000020")
         val response = gateway.createTransfer(request)
         assertEquals(Status.PENDING, response.status)

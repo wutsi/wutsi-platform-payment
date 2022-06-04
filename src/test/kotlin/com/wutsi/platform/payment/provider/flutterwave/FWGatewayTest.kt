@@ -141,6 +141,7 @@ internal class FWGatewayTest {
                 amount = 3000.0,
                 currency = "XAF",
                 fee = 5.0,
+                app_fee = 0.0,
                 narration = "Sample transfer",
             )
         )
@@ -205,7 +206,8 @@ internal class FWGatewayTest {
                 id = id,
                 status = "SUCCESSFUL",
                 flw_ref = "323232323",
-                fee = 100.0
+                app_fee = 10.0,
+                fee = 1.0
             )
         )
         doReturn(resp).whenever(http).post(any(), any(), any(), eq(FWResponse::class.java), any())
@@ -218,7 +220,7 @@ internal class FWGatewayTest {
         assertEquals(Status.SUCCESSFUL, response.status)
         assertEquals(id.toString(), response.transactionId)
         assertEquals(resp.data?.flw_ref, response.financialTransactionId)
-        assertEquals(resp.data?.fee, response.fees.value)
+        assertEquals(resp.data?.app_fee, response.fees.value)
 
         val headers = argumentCaptor<Map<String, String>>()
         verify(http).post(

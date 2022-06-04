@@ -55,7 +55,7 @@ open class FWGateway(
                     transactionId = id?.toString() ?: "",
                     financialTransactionId = response.data?.flw_ref,
                     status = toStatus(response),
-                    fees = Money(response.data?.fee ?: 0.0, request.amount.currency)
+                    fees = Money(response.data?.app_fee ?: 0.0, request.amount.currency)
                 )
             }
         } catch (ex: HttpException) {
@@ -64,34 +64,7 @@ open class FWGateway(
     }
 
     override fun getPayment(transactionId: String): GetPaymentResponse {
-        val response = http.get(
-            referenceId = transactionId,
-            uri = "$BASE_URI/charges/$transactionId",
-            responseType = FWResponse::class.java,
-            headers = toHeaders()
-        )
-
-        val status = toStatus(response!!)
-        val data = response.data
-        if (status == Status.FAILED)
-            throw toPaymentException(response)
-        else {
-            return GetPaymentResponse(
-                amount = Money(
-                    value = data?.amount ?: 0.0,
-                    currency = data?.currency ?: ""
-                ),
-                status = toStatus(response),
-                description = data?.narration ?: "",
-                payer = Party(
-                    fullName = data?.full_name ?: "",
-                    phoneNumber = data?.account_number ?: ""
-                ),
-                fees = Money(data?.fee ?: 0.0, data?.currency ?: ""),
-                externalId = data?.tx_ref ?: "",
-                financialTransactionId = data?.flw_ref
-            )
-        }
+        TODO("Not supported by Flutterwave")
     }
 
     override fun createTransfer(request: CreateTransferRequest): CreateTransferResponse {
