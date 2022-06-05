@@ -24,4 +24,6 @@ data class FWResponseData(
     val charge_type: String? = null,
     val processor_response: String? = null,
     val customer: FWCustomer? = null,
+    val available_balance: Long? = null,
+    val ledger_balance: Double? = null,
 )

@@ -2,7 +2,6 @@ package com.wutsi.platform.payment.provider.flutterwave
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.wutsi.platform.payment.Gateway
 import com.wutsi.platform.payment.core.Http
 import com.wutsi.platform.payment.core.Money
 import com.wutsi.platform.payment.core.Status
@@ -20,7 +19,7 @@ import kotlin.test.assertNull
 internal class FWGatewayIntegrationTest {
     private val secretKey = "FLWSECK_TEST-b4cb2c97ac5127c3bd06995c0ce1032a-X"
     private lateinit var http: Http
-    private lateinit var gateway: Gateway
+    private lateinit var gateway: FWGateway
 
     @BeforeEach
     fun setUp() {
@@ -76,6 +75,11 @@ internal class FWGatewayIntegrationTest {
         assertEquals(request.payee.fullName, response2.payee.fullName)
         assertNull(request.payee.country, response2.payee.country)
         assertEquals(request.payee.phoneNumber.substring(1), response2.payee.phoneNumber)
+    }
+
+    @Test
+    fun healtcheck() {
+        gateway.heathcheck()
     }
 
     private fun createTransferRequest(phoneNumber: String) = CreateTransferRequest(

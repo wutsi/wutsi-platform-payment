@@ -19,6 +19,9 @@ import com.wutsi.platform.payment.model.Party
 import com.wutsi.platform.payment.provider.flutterwave.model.FWChargeRequest
 import com.wutsi.platform.payment.provider.flutterwave.model.FWResponse
 import com.wutsi.platform.payment.provider.flutterwave.model.FWTransferRequest
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 open class FWGateway(
     private val http: Http,
@@ -26,6 +29,20 @@ open class FWGateway(
 ) : Gateway {
     companion object {
         const val BASE_URI = "https://api.flutterwave.com/v3"
+    }
+
+    open fun heathcheck() {
+        try {
+            val from = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            http.get(
+                referenceId = UUID.randomUUID().toString(),
+                uri = "$BASE_URI/transactions?from=$from",
+                responseType = Any::class.java,
+                headers = toHeaders(),
+            )
+        } catch (ex: HttpException) {
+            throw handleException(ex)
+        }
     }
 
     override fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {

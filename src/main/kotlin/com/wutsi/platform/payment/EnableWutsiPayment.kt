@@ -1,5 +1,6 @@
 package com.wutsi.platform.payment
 
+import com.wutsi.platform.payment.provider.flutterwave.spring.FlutterwaveConfiguration
 import com.wutsi.platform.payment.provider.mtn.spring.MTNConfiguration
 import com.wutsi.platform.payment.provider.om.spring.OMConfiguration
 import com.wutsi.platform.payment.spring.GatewayConfiguration
@@ -11,7 +12,8 @@ import org.springframework.context.annotation.Import
     value = [
         GatewayConfiguration::class,
         MTNConfiguration::class,
-        OMConfiguration::class
+        OMConfiguration::class,
+        FlutterwaveConfiguration::class
     ]
 )
 annotation class EnableWutsiPayment
