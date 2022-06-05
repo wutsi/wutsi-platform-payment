@@ -248,6 +248,12 @@ open class FWGateway(
     }
 }
 
+/**
+ * Inline function to wrap all FW call in a try block
+ * - If FW return a plain/text response, this is usually because of connectivity issue => the FW call will be retry (up to 3 time)
+ * - If HTTP error return, the response will be parsed an a PaymentException will be thrown
+ * - Otherwise, the response is returned
+ */
 inline fun <T> fwRetryable(bloc: () -> T): T {
     var retry = 0
     while (true) {
@@ -272,4 +278,3 @@ inline fun <T> fwRetryable(bloc: () -> T): T {
         }
     }
 }
-
