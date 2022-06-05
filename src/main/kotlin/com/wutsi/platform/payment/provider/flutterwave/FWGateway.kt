@@ -1,5 +1,6 @@
 package com.wutsi.platform.payment.provider.flutterwave
 
+import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wutsi.platform.payment.Gateway
 import com.wutsi.platform.payment.PaymentException
@@ -16,9 +17,11 @@ import com.wutsi.platform.payment.model.CreateTransferResponse
 import com.wutsi.platform.payment.model.GetPaymentResponse
 import com.wutsi.platform.payment.model.GetTransferResponse
 import com.wutsi.platform.payment.model.Party
+import com.wutsi.platform.payment.provider.flutterwave.FWGateway.Companion.toPaymentException
 import com.wutsi.platform.payment.provider.flutterwave.model.FWChargeRequest
 import com.wutsi.platform.payment.provider.flutterwave.model.FWResponse
 import com.wutsi.platform.payment.provider.flutterwave.model.FWTransferRequest
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -30,29 +33,42 @@ open class FWGateway(
 ) : Gateway {
     companion object {
         const val BASE_URI = "https://api.flutterwave.com/v3"
-        const val HEATH_CHECK_MAX_RETRIES = 3
-        const val MAX_HEATH_DELAY_MILLIS = 5000L
-        private val LOGGER = LoggerFactory.getLogger(FWGateway::class.java)
-    }
+        const val MAX_RETRIES = 3
+        const val RETRY_DELAY_MILLIS = 1000L
+        val LOGGER: Logger = LoggerFactory.getLogger(FWGateway::class.java)
 
-    open fun health() {
-        var retry = 0
-        while (true) {
-            try {
-                runHealthCheck()
-                break
-            } catch (ex: Throwable) {
-                LOGGER.warn("$retry - Health check failed", ex)
+        fun toPaymentException(response: FWResponse, ex: Throwable? = null) = PaymentException(
+            error = Error(
+                transactionId = response.data?.id?.toString() ?: "",
+                code = toErrorCode(response),
+                supplierErrorCode = response.code,
+                message = response.message,
+                errorId = response.error_id
+            ),
+            ex
+        )
 
-                if (retry++ >= HEATH_CHECK_MAX_RETRIES)
-                    throw ex
-                else
-                    Thread.sleep(MAX_HEATH_DELAY_MILLIS) // Pause before re-try
-            }
+        /**
+         * See https://developer.flutterwave.com/docs/integration-guides/errors/
+         */
+        fun toErrorCode(response: FWResponse): ErrorCode = when (response.message) {
+            "DECLINED" -> ErrorCode.DECLINED
+            "INSUFFICIENT_FUNDS" -> ErrorCode.NOT_ENOUGH_FUNDS
+            "ABORTED" -> ErrorCode.ABORTED
+            "CANCELLED" -> ErrorCode.CANCELLED
+            "SYSTEM_ERROR" -> ErrorCode.INTERNAL_PROCESSING_ERROR
+            "AUTHENTICATION_FAILED" -> ErrorCode.AUTHENTICATION_FAILED
+            "Transaction has been flagged as fraudulent" -> ErrorCode.FRAUDULENT
+            "email is required" -> ErrorCode.EMAIL_MISSING
+            else -> ErrorCode.UNEXPECTED_ERROR
         }
     }
 
-    private fun runHealthCheck() {
+    open fun health() {
+        fwRetryable { doHealth() }
+    }
+
+    private fun doHealth() {
         val from = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         http.get(
             referenceId = UUID.randomUUID().toString(),
@@ -62,20 +78,22 @@ open class FWGateway(
         )
     }
 
-    override fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {
-        try {
+    override fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse =
+        fwRetryable {
+            val fwRequest = FWChargeRequest(
+                amount = toAmount(request.amount),
+                currency = request.amount.currency,
+                email = request.payer.email ?: "",
+                tx_ref = request.externalId,
+                phone_number = toPhoneNumber(request.payer.phoneNumber),
+                country = request.payer.country,
+                fullname = request.payer.fullName
+            )
+
             val response = http.post(
                 referenceId = request.externalId,
                 uri = "$BASE_URI/charges?type=" + toChargeType(request),
-                requestPayload = FWChargeRequest(
-                    amount = toAmount(request.amount),
-                    currency = request.amount.currency,
-                    email = request.payer.email ?: "",
-                    tx_ref = request.externalId,
-                    phone_number = toPhoneNumber(request.payer.phoneNumber),
-                    country = request.payer.country,
-                    fullname = request.payer.fullName
-                ),
+                requestPayload = fwRequest,
                 responseType = FWResponse::class.java,
                 headers = toHeaders()
             )!!
@@ -92,45 +110,43 @@ open class FWGateway(
                     fees = Money(response.data?.app_fee ?: 0.0, request.amount.currency)
                 )
             }
-        } catch (ex: HttpException) {
-            throw handleException(ex)
         }
-    }
 
-    override fun getPayment(transactionId: String): GetPaymentResponse {
-        val response = http.get(
-            referenceId = transactionId,
-            uri = "$BASE_URI/transactions/$transactionId/verify",
-            responseType = FWResponse::class.java,
-            headers = toHeaders()
-        )
-
-        val status = toStatus(response!!)
-        val data = response.data
-        if (status == Status.FAILED)
-            throw toPaymentException(response)
-        else {
-            return GetPaymentResponse(
-                amount = Money(
-                    value = data?.amount ?: 0.0,
-                    currency = data?.currency ?: ""
-                ),
-                status = toStatus(response),
-                description = data?.narration ?: "",
-                payer = Party(
-                    fullName = data?.customer?.name ?: "",
-                    phoneNumber = data?.customer?.phone_number ?: "",
-                    email = data?.customer?.email
-                ),
-                fees = Money(data?.app_fee ?: 0.0, data?.currency ?: ""),
-                externalId = data?.tx_ref ?: "",
-                financialTransactionId = data?.flw_ref
+    override fun getPayment(transactionId: String): GetPaymentResponse =
+        fwRetryable {
+            val response = http.get(
+                referenceId = transactionId,
+                uri = "$BASE_URI/transactions/$transactionId/verify",
+                responseType = FWResponse::class.java,
+                headers = toHeaders()
             )
-        }
-    }
 
-    override fun createTransfer(request: CreateTransferRequest): CreateTransferResponse {
-        try {
+            val status = toStatus(response!!)
+            val data = response.data
+            if (status == Status.FAILED)
+                throw toPaymentException(response)
+            else {
+                return GetPaymentResponse(
+                    amount = Money(
+                        value = data?.amount ?: 0.0,
+                        currency = data?.currency ?: ""
+                    ),
+                    status = toStatus(response),
+                    description = data?.narration ?: "",
+                    payer = Party(
+                        fullName = data?.customer?.name ?: "",
+                        phoneNumber = data?.customer?.phone_number ?: "",
+                        email = data?.customer?.email
+                    ),
+                    fees = Money(data?.app_fee ?: 0.0, data?.currency ?: ""),
+                    externalId = data?.tx_ref ?: "",
+                    financialTransactionId = data?.flw_ref
+                )
+            }
+        }
+
+    override fun createTransfer(request: CreateTransferRequest): CreateTransferResponse =
+        fwRetryable {
             val payload = FWTransferRequest(
                 amount = toAmount(request.amount),
                 currency = request.amount.currency,
@@ -160,58 +176,38 @@ open class FWGateway(
                     fees = Money(response.data?.fee ?: 0.0, response.data?.currency ?: ""),
                 )
             }
-        } catch (ex: HttpException) {
-            throw handleException(ex)
         }
-    }
 
-    override fun getTransfer(transactionId: String): GetTransferResponse {
-        val response = http.get(
-            referenceId = transactionId,
-            uri = "$BASE_URI/transfers/$transactionId",
-            responseType = FWResponse::class.java,
-            headers = toHeaders()
-        )
-
-        val status = toStatus(response!!)
-        val data = response.data
-        if (status == Status.FAILED)
-            throw toPaymentException(response)
-        else {
-            return GetTransferResponse(
-                amount = Money(
-                    value = data?.amount ?: 0.0,
-                    currency = data?.currency ?: ""
-                ),
-                status = toStatus(response),
-                description = data?.narration ?: "",
-                payee = Party(
-                    fullName = data?.full_name ?: "",
-                    phoneNumber = data?.account_number ?: ""
-                ),
-                fees = Money(data?.fee ?: 0.0, data?.currency ?: ""),
-                externalId = data?.reference ?: ""
+    override fun getTransfer(transactionId: String): GetTransferResponse =
+        fwRetryable {
+            val response = http.get(
+                referenceId = transactionId,
+                uri = "$BASE_URI/transfers/$transactionId",
+                responseType = FWResponse::class.java,
+                headers = toHeaders()
             )
+
+            val status = toStatus(response!!)
+            val data = response.data
+            if (status == Status.FAILED)
+                throw toPaymentException(response)
+            else {
+                return GetTransferResponse(
+                    amount = Money(
+                        value = data?.amount ?: 0.0,
+                        currency = data?.currency ?: ""
+                    ),
+                    status = toStatus(response),
+                    description = data?.narration ?: "",
+                    payee = Party(
+                        fullName = data?.full_name ?: "",
+                        phoneNumber = data?.account_number ?: ""
+                    ),
+                    fees = Money(data?.fee ?: 0.0, data?.currency ?: ""),
+                    externalId = data?.reference ?: ""
+                )
+            }
         }
-    }
-
-    private fun toSupplyErrorCode(response: FWResponse): String? =
-        response.code
-
-    /**
-     * See https://developer.flutterwave.com/docs/integration-guides/errors/
-     */
-    private fun toErrorCode(response: FWResponse): ErrorCode = when (response.message) {
-        "DECLINED" -> ErrorCode.DECLINED
-        "INSUFFICIENT_FUNDS" -> ErrorCode.NOT_ENOUGH_FUNDS
-        "ABORTED" -> ErrorCode.ABORTED
-        "CANCELLED" -> ErrorCode.CANCELLED
-        "SYSTEM_ERROR" -> ErrorCode.INTERNAL_PROCESSING_ERROR
-        "AUTHENTICATION_FAILED" -> ErrorCode.AUTHENTICATION_FAILED
-        "Transaction has been flagged as fraudulent" -> ErrorCode.FRAUDULENT
-        "email is required" -> ErrorCode.EMAIL_MISSING
-        else -> ErrorCode.UNEXPECTED_ERROR
-    }
 
     private fun toHeaders() = mapOf(
         "Authorization" to "Bearer $secretKey",
@@ -250,21 +246,30 @@ open class FWGateway(
         }
         else -> throw IllegalStateException("Status not supported: ${response.status}")
     }
-
-    private fun handleException(ex: HttpException): Throwable {
-        val response = ObjectMapper().readValue(ex.bodyString, FWResponse::class.java)
-        return toPaymentException(response, ex)
-    }
-
-    private fun toPaymentException(response: FWResponse, ex: Throwable? = null) =
-        PaymentException(
-            error = Error(
-                transactionId = response.data?.id?.toString() ?: "",
-                code = toErrorCode(response),
-                supplierErrorCode = toSupplyErrorCode(response),
-                message = response.message,
-                errorId = response.error_id
-            ),
-            ex
-        )
 }
+
+inline fun <T> fwRetryable(bloc: () -> T): T {
+    var retry = 0
+    while (true) {
+        try {
+            return bloc()
+        } catch (ex: JsonParseException) { // On connectivity error, FW return plain/text response
+            FWGateway.LOGGER.warn("$retry - request failed...", ex)
+            if (retry++ >= FWGateway.MAX_RETRIES)
+                throw ex
+            else
+                Thread.sleep(FWGateway.RETRY_DELAY_MILLIS) // Pause before re-try
+        } catch (ex: HttpException) {
+            try {
+                val response = ObjectMapper().readValue(ex.bodyString, FWResponse::class.java)
+                throw toPaymentException(response, ex)
+            } catch (ex1: JsonParseException) {
+                throw PaymentException(
+                    error = Error(code = ErrorCode.UNEXPECTED_ERROR),
+                    cause = ex1
+                )
+            }
+        }
+    }
+}
+
