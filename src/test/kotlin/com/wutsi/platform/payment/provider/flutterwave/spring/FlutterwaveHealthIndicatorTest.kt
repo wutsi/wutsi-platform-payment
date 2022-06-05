@@ -34,5 +34,4 @@ internal class FlutterwaveHealthIndicatorTest {
 
         assertEquals(Status.DOWN, result.status)
     }
-
 }
