@@ -4,7 +4,7 @@
 
   <artifactId>wutsi-platform-payment</artifactId>
   <groupId>com.wutsi</groupId>
-  <version>0.0.80-SNAPSHOT</version>
+  <version>0.0.81-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>wutsi-platform-payment</name>
