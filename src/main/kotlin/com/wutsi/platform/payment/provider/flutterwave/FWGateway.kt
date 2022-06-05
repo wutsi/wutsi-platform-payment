@@ -192,6 +192,7 @@ open class FWGateway(
         "SYSTEM_ERROR" -> ErrorCode.INTERNAL_PROCESSING_ERROR
         "AUTHENTICATION_FAILED" -> ErrorCode.AUTHENTICATION_FAILED
         "Transaction has been flagged as fraudulent" -> ErrorCode.FRAUDULENT
+        "email is required" -> ErrorCode.EMAIL_MISSING
         else -> ErrorCode.UNEXPECTED_ERROR
     }
 

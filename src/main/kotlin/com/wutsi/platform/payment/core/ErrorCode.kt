@@ -24,6 +24,7 @@ enum class ErrorCode {
     ABORTED,
     CANCELLED,
     FRAUDULENT,
+    EMAIL_MISSING,
 
     UNEXPECTED_ERROR
 }
