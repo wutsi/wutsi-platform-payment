@@ -15,7 +15,7 @@ class FlutterwaveHealthIndicator(
     override fun health(): Health {
         val now = System.currentTimeMillis()
         try {
-            gateway.heathcheck()
+            gateway.health()
             return Health.up()
                 .withDetail("durationMillis", System.currentTimeMillis() - now)
                 .build()

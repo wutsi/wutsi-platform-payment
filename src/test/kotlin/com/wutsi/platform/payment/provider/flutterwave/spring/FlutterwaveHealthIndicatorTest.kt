@@ -28,7 +28,7 @@ internal class FlutterwaveHealthIndicatorTest {
 
     @Test
     fun down() {
-        doThrow(RuntimeException::class).whenever(gateway).heathcheck()
+        doThrow(RuntimeException::class).whenever(gateway).health()
 
         val result = hc.health()
 

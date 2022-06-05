@@ -19,6 +19,7 @@ import com.wutsi.platform.payment.model.Party
 import com.wutsi.platform.payment.provider.flutterwave.model.FWChargeRequest
 import com.wutsi.platform.payment.provider.flutterwave.model.FWResponse
 import com.wutsi.platform.payment.provider.flutterwave.model.FWTransferRequest
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -29,20 +30,36 @@ open class FWGateway(
 ) : Gateway {
     companion object {
         const val BASE_URI = "https://api.flutterwave.com/v3"
+        const val HEATH_CHECK_MAX_RETRIES = 3
+        const val MAX_HEATH_DELAY_MILLIS = 5000L
+        private val LOGGER = LoggerFactory.getLogger(FWGateway::class.java)
     }
 
-    open fun heathcheck() {
-        try {
-            val from = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-            http.get(
-                referenceId = UUID.randomUUID().toString(),
-                uri = "$BASE_URI/transactions?from=$from",
-                responseType = Any::class.java,
-                headers = toHeaders(),
-            )
-        } catch (ex: HttpException) {
-            throw handleException(ex)
+    open fun health() {
+        var retry = 0
+        while (true) {
+            try {
+                runHealthCheck()
+                break
+            } catch (ex: Throwable) {
+                LOGGER.warn("$retry - Health check failed", ex)
+
+                if (retry++ >= HEATH_CHECK_MAX_RETRIES)
+                    throw ex
+                else
+                    Thread.sleep(MAX_HEATH_DELAY_MILLIS) // Pause before re-try
+            }
         }
+    }
+
+    private fun runHealthCheck() {
+        val from = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        http.get(
+            referenceId = UUID.randomUUID().toString(),
+            uri = "$BASE_URI/transactions?from=$from",
+            responseType = Map::class.java,
+            headers = toHeaders(),
+        )
     }
 
     override fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {

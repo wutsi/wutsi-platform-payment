@@ -33,7 +33,7 @@ internal class FWGatewayIntegrationTest {
     }
 
     @Test
-    fun `MobileMoney - CM - payment - success`() {
+    fun `MobileMoney - CM - payment`() {
         // WHEN
         val request = createPaymentRequest("+23700000020")
         val response = gateway.createPayment(request)
@@ -79,7 +79,7 @@ internal class FWGatewayIntegrationTest {
 
     @Test
     fun healtcheck() {
-        gateway.heathcheck()
+        gateway.health()
     }
 
     private fun createTransferRequest(phoneNumber: String) = CreateTransferRequest(
