@@ -4,7 +4,7 @@
 
   <artifactId>wutsi-platform-payment</artifactId>
   <groupId>com.wutsi</groupId>
-  <version>0.0.84-SNAPSHOT</version>
+  <version>0.0.84</version>
   <packaging>jar</packaging>
 
   <name>wutsi-platform-payment</name>
@@ -24,7 +24,7 @@
     <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
     <maven-jacoco-plugin.version>0.8.8</maven-jacoco-plugin.version>
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-    <slf4j.version>1.7.34</slf4j.version>
+    <slf4j.version>1.7.36</slf4j.version>
     <spring-boot.version>2.6.6</spring-boot.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -34,7 +34,7 @@
 
   <scm>
     <developerConnection>scm:git:https://github.com/wutsi/wutsi-platform-payment.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>wutsi-platform-payment-0.0.84</tag>
   </scm>
   <distributionManagement>
     <repository>
