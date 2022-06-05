@@ -23,6 +23,7 @@ import com.wutsi.platform.payment.provider.flutterwave.model.FWResponse
 import com.wutsi.platform.payment.provider.flutterwave.model.FWTransferRequest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.IOException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -250,7 +251,7 @@ open class FWGateway(
 
 /**
  * Inline function to wrap all FW call in a try block
- * - If FW return a plain/text response, this is usually because of connectivity issue => the FW call will be retry (up to 3 time)
+ * - If IO error => the FW call will be retry (up to 3 times)
  * - If HTTP error return, the response will be parsed an a PaymentException will be thrown
  * - Otherwise, the response is returned
  */
@@ -259,7 +260,7 @@ inline fun <T> fwRetryable(bloc: () -> T): T {
     while (true) {
         try {
             return bloc()
-        } catch (ex: JsonParseException) { // On connectivity error, FW return plain/text response
+        } catch (ex: IOException) { // On connectivity error, retry
             FWGateway.LOGGER.warn("$retry - request failed...", ex)
             if (retry++ >= FWGateway.MAX_RETRIES)
                 throw ex
