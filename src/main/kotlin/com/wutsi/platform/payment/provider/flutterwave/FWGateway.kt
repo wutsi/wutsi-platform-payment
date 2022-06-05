@@ -30,7 +30,7 @@ import java.util.UUID
 
 open class FWGateway(
     private val http: Http,
-    private val secretKey: String
+    private val secretKey: String,
 ) : Gateway {
     companion object {
         const val BASE_URI = "https://api.flutterwave.com/v3"

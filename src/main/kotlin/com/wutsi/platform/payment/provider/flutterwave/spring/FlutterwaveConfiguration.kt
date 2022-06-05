@@ -20,7 +20,7 @@ import java.net.http.HttpClient
 )
 open class FlutterwaveConfiguration(
     private val gatewayProvider: GatewayProvider,
-
+    private val objectMapper: ObjectMapper,
     @Value("\${wutsi.platform.payment.flutterwave.secret-key}") private val secretKey: String,
 ) {
     @Bean
@@ -38,7 +38,7 @@ open class FlutterwaveConfiguration(
                 .version(HttpClient.Version.HTTP_1_1)
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build(),
-            objectMapper = ObjectMapper(),
+            objectMapper = objectMapper,
             listener = DefaultHttpListener()
         )
     }

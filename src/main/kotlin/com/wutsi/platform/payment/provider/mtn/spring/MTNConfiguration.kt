@@ -37,6 +37,7 @@ import javax.net.ssl.X509TrustManager
 )
 open class MTNConfiguration(
     private val gatewayProvider: GatewayProvider,
+    private val objectMapper: ObjectMapper,
 
     @Value("\${wutsi.platform.payment.mtn.environment}") private val environment: String,
     @Value("\${wutsi.platform.payment.mtn.callback-url}") private val callbackUrl: String,
@@ -115,7 +116,7 @@ open class MTNConfiguration(
                     .version(HTTP_1_1)
                     .followRedirects(NORMAL)
                     .build(),
-                objectMapper = ObjectMapper(),
+                objectMapper = objectMapper,
                 listener = DefaultHttpListener()
             )
         } else {
@@ -138,7 +139,7 @@ open class MTNConfiguration(
                     .sslContext(context)
                     .followRedirects(NORMAL)
                     .build(),
-                objectMapper = ObjectMapper()
+                objectMapper = objectMapper
             )
         }
     }
