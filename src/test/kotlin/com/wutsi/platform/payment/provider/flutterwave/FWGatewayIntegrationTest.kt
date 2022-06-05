@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.http.HttpClient
 import java.util.UUID
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -33,6 +34,7 @@ internal class FWGatewayIntegrationTest {
     }
 
     @Test
+    @Ignore
     fun `MobileMoney - CM - payment`() {
         // WHEN
         val request = createPaymentRequest("+23700000020")
@@ -55,6 +57,7 @@ internal class FWGatewayIntegrationTest {
     }
 
     @Test
+    @Ignore
     fun `MobileMoney - CM - transfer`() {
         // TRANSFER
         println("Transfer...")
